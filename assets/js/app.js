@@ -3,6 +3,13 @@
    Backend-based auth · API-first architecture
    ═══════════════════════════════════════════ */
 
+/* ── HTML escape helper (XSS prevention) ── */
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s ?? '');
+  return d.innerHTML;
+}
+
 /* ── Products (local catalog for rendering) ── */
 const PRODUCTS = [
   { id:1,  name:"Origami Rừng Nhiệt Đới",   em:"🦜", col:"Jungle Friends",      cat:"kit",  age:"4–6 tuổi",  price:59000,  old:null,   badge:"hot",  bg:"#F0FDF4",
@@ -266,9 +273,9 @@ function showUserMenu() {
 
   menu.innerHTML = `
     <div style="padding:12px 16px 8px;border-bottom:1px solid var(--parchment);font-size:.82rem">
-      <strong>${Auth.user.name}</strong>
-      <div style="font-size:.72rem;color:var(--ink-3);margin-top:2px">${Auth.user.email}</div>
-      <div style="font-size:.68rem;color:var(--orange);font-weight:700;margin-top:3px;text-transform:uppercase">${Auth.user.role}</div>
+      <strong>${esc(Auth.user.name)}</strong>
+      <div style="font-size:.72rem;color:var(--ink-3);margin-top:2px">${esc(Auth.user.email)}</div>
+      <div style="font-size:.68rem;color:var(--orange);font-weight:700;margin-top:3px;text-transform:uppercase">${esc(Auth.user.role)}</div>
     </div>
     ${items.map(i=>`<div onclick="${i.href?`location.href='${i.href}'`:i.action};document.getElementById('userMenuPopup')?.remove()" style="padding:10px 16px;font-size:.84rem;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--cream-2)'" onmouseout="this.style.background=''">${i.label}</div>`).join('')}`;
 
@@ -481,21 +488,21 @@ function productCardHTML(p, base='') {
   return `
   <div class="product-card" onclick="location.href='${base}pages/product-detail.html?id=${p.id}'" role="article" tabindex="0" onkeydown="if(event.key==='Enter')this.click()">
     <div class="product-card-img" style="background:${p.bg||'#FEF5EA'}">
-      <img src="${pngSrc}" alt="${p.name}" loading="lazy" class="product-real-img"
+      <img src="${pngSrc}" alt="${esc(p.name)}" loading="lazy" class="product-real-img"
         onerror="this.src='${svgSrc}';this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='flex'};this.className='product-svg-img'">
-      <span class="product-emoji" style="display:none">${p.em}</span>
+      <span class="product-emoji" style="display:none">${esc(p.em)}</span>
       ${p.badge ? `<span class="product-badge ${p.badge}">${badgeLabel}</span>` : ''}
     </div>
     <div class="product-card-body">
-      <div class="product-age">${p.col} · ${p.age}</div>
-      <div class="product-name">${p.name}</div>
-      <div class="product-desc">${p.desc}</div>
+      <div class="product-age">${esc(p.col)} · ${esc(p.age)}</div>
+      <div class="product-name">${esc(p.name)}</div>
+      <div class="product-desc">${esc(p.desc)}</div>
       <div class="product-footer">
         <div>
           ${p.old ? `<span class="product-old-price">${p.old.toLocaleString('vi-VN')}đ</span>` : ''}
           <span class="product-price">${p.price.toLocaleString('vi-VN')}đ</span>
         </div>
-        <button class="add-btn" onclick="event.stopPropagation();Cart.add(${p.id})" title="Thêm vào giỏ" aria-label="Thêm ${p.name} vào giỏ">+</button>
+        <button class="add-btn" onclick="event.stopPropagation();Cart.add(${p.id})" title="Thêm vào giỏ" aria-label="Thêm ${esc(p.name)} vào giỏ">+</button>
       </div>
     </div>
   </div>`;

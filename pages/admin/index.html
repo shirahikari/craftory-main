@@ -179,7 +179,7 @@ async function loadDashboard() {
       (s.topProducts||[]).slice(0,5).map((tp,i)=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--parchment)">
           <div>
-            <div style="font-size:.83rem;font-weight:600">${i+1}. ${tp.product?.emoji||''} ${tp.product?.name||'Sản phẩm'}</div>
+            <div style="font-size:.83rem;font-weight:600">${i+1}. ${esc(tp.product?.emoji||'')} ${esc(tp.product?.name||'Sản phẩm')}</div>
             <div style="font-size:.72rem;color:var(--ink-4)">×${tp.totalQty} bán ra</div>
           </div>
           <div style="font-family:var(--font-h);font-weight:700;color:var(--orange);font-size:.84rem">${(tp.totalRevenue||0).toLocaleString('vi-VN')}đ</div>
@@ -189,10 +189,10 @@ async function loadDashboard() {
       (s.recentOrders||[]).slice(0,8).map(o=>`
         <tr>
           <td style="font-family:var(--font-h);font-size:.75rem;font-weight:700;color:var(--ink-3)">#${o.id.slice(-8).toUpperCase()}</td>
-          <td><div style="font-weight:600;font-size:.84rem">${o.shippingName}</div><div style="font-size:.72rem;color:var(--ink-4)">${o.user?.email||''}</div></td>
+          <td><div style="font-weight:600;font-size:.84rem">${esc(o.shippingName)}</div><div style="font-size:.72rem;color:var(--ink-4)">${esc(o.user?.email||'')}</div></td>
           <td style="font-family:var(--font-h);font-weight:700;color:var(--orange)">${o.total.toLocaleString('vi-VN')}đ</td>
           <td style="font-size:.76rem;color:var(--ink-4)">${new Date(o.createdAt).toLocaleDateString('vi-VN')}</td>
-          <td style="font-size:.78rem;font-weight:600">${STATUS_VN[o.status]||o.status}</td>
+          <td style="font-size:.78rem;font-weight:600">${STATUS_VN[o.status]||esc(o.status)}</td>
         </tr>`).join('') || `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--ink-4)">Chưa có đơn hàng</td></tr>`;
   } catch(e) {
     console.error('Dashboard error:', e);
@@ -206,9 +206,9 @@ async function loadUsers() {
     const { users } = await API.admin.users.list();
     tbody.innerHTML = users.map(u => `
       <tr>
-        <td style="font-weight:600">${u.name}</td>
-        <td style="font-size:.82rem">${u.email}</td>
-        <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+        <td style="font-weight:600">${esc(u.name)}</td>
+        <td style="font-size:.82rem">${esc(u.email)}</td>
+        <td><span class="role-badge role-${esc(u.role)}">${esc(u.role)}</span></td>
         <td style="font-size:.82rem;font-weight:600;color:${u.status==='active'?'var(--green)':'var(--rose)'}">${u.status==='active'?'Hoạt động':'Vô hiệu'}</td>
         <td style="font-size:.76rem;color:var(--ink-4)">${new Date(u.createdAt).toLocaleDateString('vi-VN')}</td>
         <td>
@@ -255,8 +255,8 @@ async function loadAdminOrders() {
     tbody.innerHTML = orders.map(o=>`
       <tr>
         <td style="font-family:var(--font-h);font-size:.76rem;font-weight:700;color:var(--ink-3)">#${o.id.slice(-8).toUpperCase()}</td>
-        <td><div style="font-weight:600;font-size:.83rem">${o.shippingName}</div><div style="font-size:.72rem;color:var(--ink-4)">${o.shippingPhone}</div></td>
-        <td style="font-size:.76rem;color:var(--ink-3);max-width:200px">${o.items.map(i=>`${i.product?.name||'SP'} ×${i.qty}`).join(', ')}</td>
+        <td><div style="font-weight:600;font-size:.83rem">${esc(o.shippingName)}</div><div style="font-size:.72rem;color:var(--ink-4)">${esc(o.shippingPhone)}</div></td>
+        <td style="font-size:.76rem;color:var(--ink-3);max-width:200px">${o.items.map(i=>`${esc(i.product?.name||'SP')} ×${i.qty}`).join(', ')}</td>
         <td style="font-family:var(--font-h);font-weight:700;color:var(--orange);font-size:.83rem">${o.total.toLocaleString('vi-VN')}đ</td>
         <td style="font-size:.76rem;color:var(--ink-4)">${new Date(o.createdAt).toLocaleDateString('vi-VN')}</td>
         <td>

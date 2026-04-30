@@ -37,6 +37,9 @@ export default async function adminUserRoutes(fastify) {
     if (id === req.user.id && parsed.data.role && parsed.data.role !== 'admin') {
       throw new AppError('Không thể tự hạ quyền của mình.', 400);
     }
+    if (id === req.user.id && parsed.data.status === 'disabled') {
+      throw new AppError('Không thể tự vô hiệu hóa tài khoản admin của mình.', 400);
+    }
 
     const target = await fastify.prisma.user.findUnique({ where: { id } });
     if (!target) return reply.code(404).send({ message: 'Không tìm thấy người dùng.' });

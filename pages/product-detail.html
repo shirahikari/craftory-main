@@ -207,17 +207,17 @@ if (!p) {
     <!-- Gallery -->
     <div class="pdp-gallery">
       <div class="pdp-img-main has-real-photo" id="mainImg" style="background:${p.bg}">
-        <img src="../assets/images/product-images/KIT${kitNum}/KIT${kitNum}-1.png" alt="${p.name}" id="mainImgEl" class="pdp-real-img"
+        <img src="../assets/images/product-images/KIT${kitNum}/KIT${kitNum}-1.png" alt="${esc(p.name)}" id="mainImgEl" class="pdp-real-img"
           onerror="this.src='${svgSrc}';this.className='pdp-svg-img';document.getElementById('mainImg').classList.remove('has-real-photo');this.onerror=function(){this.style.display='none';document.getElementById('mainImgFb').style.display='flex'}">
-        <div id="mainImgFb" style="display:none;font-size:9rem;width:100%;height:100%;align-items:center;justify-content:center">${p.em}</div>
+        <div id="mainImgFb" style="display:none;font-size:9rem;width:100%;height:100%;align-items:center;justify-content:center">${esc(p.em)}</div>
         ${p.badge ? `<span class="pdp-badge-main ${p.badge}">${badgeMap[p.badge]}</span>` : ''}
       </div>
       <div class="pdp-thumbs">
         ${[1,2,3,4].map((n, i) => `
         <div class="pdp-thumb ${i === 0 ? 'active' : ''}" onclick="setThumb(this,${i})" style="background:${thumbBgs[i]}">
           <img src="../assets/images/product-images/KIT${kitNum}/KIT${kitNum}-${n}.png"
-            alt="${p.name} ${n}" style="width:100%;height:100%;object-fit:cover"
-            onerror="this.src='${svgSrc}';this.style.objectFit='contain';this.style.padding='8px';this.onerror=function(){this.style.display='none';this.parentElement.textContent='${p.em}'}">
+            alt="${esc(p.name)} ${n}" style="width:100%;height:100%;object-fit:cover"
+            onerror="this.src='${svgSrc}';this.style.objectFit='contain';this.style.padding='8px';this.onerror=function(){this.style.display='none';this.parentElement.textContent='${esc(p.em)}'}">
         </div>`).join('')}
       </div>
     </div>
@@ -226,14 +226,14 @@ if (!p) {
     <div class="pdp-info">
       <div class="pdp-tags">
         <span class="pdp-tag blue">${catMap[p.cat]}</span>
-        <span class="pdp-tag gray">${p.age}</span>
-        <span class="pdp-tag gray">${p.col}</span>
+        <span class="pdp-tag gray">${esc(p.age)}</span>
+        <span class="pdp-tag gray">${esc(p.col)}</span>
         ${p.badge === 'hot' ? `<span class="pdp-tag red">🔥 Bán chạy</span>` : ''}
         ${p.badge === 'new' ? `<span class="pdp-tag indigo">✨ Hàng mới</span>` : ''}
         ${p.badge === 'sale' ? `<span class="pdp-tag green">🏷 Đang giảm</span>` : ''}
       </div>
 
-      <h1 class="pdp-name">${p.name}</h1>
+      <h1 class="pdp-name">${esc(p.name)}</h1>
 
       <div class="pdp-rating">
         <span class="pdp-stars">★★★★★</span>
@@ -247,7 +247,7 @@ if (!p) {
         <span class="pdp-discount-badge">Giảm ${discount}%</span>` : ''}
       </div>
 
-      <p class="pdp-desc">${p.desc}</p>
+      <p class="pdp-desc">${esc(p.desc)}</p>
       <div class="pdp-divider"></div>
 
       <!-- Qty -->
@@ -290,13 +290,13 @@ if (!p) {
           ${(p.inc || []).map(item => `
           <div class="include-item">
             <div class="include-check">✓</div>
-            <div class="include-text">${item}</div>
+            <div class="include-text">${esc(item)}</div>
           </div>`).join('')}
         </div>` : ''}
         <h4 style="font-family:var(--font-h);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);margin-bottom:14px">📋 Thông số</h4>
         <div>
-          <div class="spec-row"><span class="spec-label">Độ tuổi khuyến nghị</span><span class="spec-val">${p.age}</span></div>
-          <div class="spec-row"><span class="spec-label">Bộ sưu tập</span><span class="spec-val">${p.col}</span></div>
+          <div class="spec-row"><span class="spec-label">Độ tuổi khuyến nghị</span><span class="spec-val">${esc(p.age)}</span></div>
+          <div class="spec-row"><span class="spec-label">Bộ sưu tập</span><span class="spec-val">${esc(p.col)}</span></div>
           <div class="spec-row"><span class="spec-label">Loại sản phẩm</span><span class="spec-val">${catMap[p.cat]}</span></div>
           <div class="spec-row"><span class="spec-label">Video hướng dẫn</span><span class="spec-val">${vids.length} bài</span></div>
           <div class="spec-row"><span class="spec-label">Chứng nhận an toàn</span><span class="spec-val" style="color:var(--green)">✓ Đạt chuẩn EN71</span></div>

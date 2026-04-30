@@ -8,7 +8,7 @@ const orderItemSchema = z.object({
 });
 
 const createOrderSchema = z.object({
-  items: z.array(orderItemSchema).min(1, 'Giỏ hàng trống.'),
+  items: z.array(orderItemSchema).min(1, 'Giỏ hàng trống.').max(50, 'Giỏ hàng không được vượt quá 50 sản phẩm.'),
   shippingName: z.string().min(2, 'Tên người nhận không hợp lệ.').max(100),
   shippingPhone: z.string().regex(/^[0-9]{9,11}$/, 'Số điện thoại không hợp lệ.'),
   shippingAddress: z.string().min(10, 'Địa chỉ không hợp lệ.').max(500),

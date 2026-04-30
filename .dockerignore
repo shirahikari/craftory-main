@@ -1,0 +1,7 @@
+.git
+.env*
+docs
+backend
+*.zip
+Dockerfile
+node_modules

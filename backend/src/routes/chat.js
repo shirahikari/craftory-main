@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { z } from 'zod';
+import { requireAuth } from '../middleware/rbac.js';
 
 const chatSchema = z.object({
   messages: z.array(z.object({
@@ -86,6 +87,7 @@ async function callOllama(messages, systemPrompt) {
 
 export default async function chatRoute(fastify) {
   fastify.post('/chat', {
+    preHandler: [requireAuth],
     config: { rateLimit: { max: 20, timeWindow: '1 minute' } },
   }, async (req, reply) => {
     const parsed = chatSchema.safeParse(req.body);

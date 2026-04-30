@@ -6,7 +6,6 @@ export function requireAuth(req, reply, done) {
 }
 
 export function requireCsrf(req, reply, done) {
-  if (!req.user) return done();
   const token = req.headers['x-csrf-token'];
   const expected = req.session?.data?.csrfToken;
   if (!token || token !== expected) {

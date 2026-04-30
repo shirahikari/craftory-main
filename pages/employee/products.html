@@ -173,19 +173,19 @@ async function loadProducts() {
         <td>
           ${p.images?.[0]
             ? `<img class="prod-img" src="${p.images[0]}" alt="" onerror="this.style.display='none'">`
-            : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem">${p.emoji||'🎨'}</div>`}
+            : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem">${esc(p.emoji||'🎨')}</div>`}
         </td>
         <td>
-          <div style="font-weight:600">${p.name}</div>
-          <div style="font-size:.75rem;color:var(--ink-4)">${p.collection}</div>
+          <div style="font-weight:600">${esc(p.name)}</div>
+          <div style="font-size:.75rem;color:var(--ink-4)">${esc(p.collection)}</div>
         </td>
         <td style="font-size:.8rem">${p.category==='kit'?'Kit thủ công':'Sách hướng dẫn'}</td>
         <td>
           <div style="font-family:var(--font-h);font-weight:700;color:var(--orange)">${p.price.toLocaleString('vi-VN')}đ</div>
           ${p.oldPrice?`<div style="font-size:.75rem;color:var(--ink-4);text-decoration:line-through">${p.oldPrice.toLocaleString('vi-VN')}đ</div>`:''}
         </td>
-        <td style="font-size:.8rem">${p.ageRange}</td>
-        <td><span class="pill ${STATUS_CLS[p.status]||''}">${STATUS_VN[p.status]||p.status}</span></td>
+        <td style="font-size:.8rem">${esc(p.ageRange)}</td>
+        <td><span class="pill ${STATUS_CLS[p.status]||''}">${STATUS_VN[p.status]||esc(p.status)}</span></td>
         <td>
           <div style="display:flex;gap:6px">
             <button class="act-btn act-edit" onclick="openEditModal(${p.id})">Sửa</button>
