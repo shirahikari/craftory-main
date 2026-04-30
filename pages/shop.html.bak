@@ -502,7 +502,6 @@ document.getElementById('ftr').innerHTML = renderFooter('../');
 
 /* ─── State ─── */
 const F = { cat:'all', badge:'all', age:'all', priceMin:0, priceMax:Infinity };
-let ALL_PRODUCTS = [];
 let _pricePreset = 'all';
 let _view = 'grid';
 let _results = [];
@@ -610,24 +609,24 @@ function renderProducts(list) {
     grid.className = 'grid-list';
     grid.innerHTML = list.map(p => `
     <div class="product-card-list" onclick="location.href='product-detail.html?id=${p.id}'">
-      <div class="list-img" style="background:${p.bgColor||'var(--parchment)'}">
+      <div class="list-img" style="background:${p.bg||'var(--parchment)'}">
         <img src="../assets/images/product-images/product-${p.id}.png" alt="${esc(p.name)}"
           style="width:100%;height:100%;object-fit:cover"
           onerror="this.src='../assets/images/products/kit-${p.id}.svg';this.style.objectFit='contain';this.style.padding='8px';this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='block'}">
-        <span style="display:none;font-size:2.8rem">${esc(p.emoji||"🎨")}</span>
+        <span style="display:none;font-size:2.8rem">${esc(p.em)}</span>
       </div>
       <div class="list-body">
-        <div style="font-family:var(--font-h);font-size:.72rem;font-weight:600;color:var(--ink-4);margin-bottom:4px">${esc(p.collection)} · ${esc(p.ageRange)}</div>
+        <div style="font-family:var(--font-h);font-size:.72rem;font-weight:600;color:var(--ink-4);margin-bottom:4px">${esc(p.col)} · ${esc(p.age)}</div>
         <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:6px">${esc(p.name)}</div>
-        <div style="font-size:.84rem;color:var(--ink-4);line-height:1.6">${esc(p.description)}</div>
+        <div style="font-size:.84rem;color:var(--ink-4);line-height:1.6">${esc(p.desc)}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
           ${p.badge ? `<span class="product-badge ${p.badge}" style="position:static;font-size:.7rem">${p.badge==='hot'?'🔥 Bán chạy':p.badge==='new'?'✨ Mới':'🏷 Giảm giá'}</span>` : ''}
-          <span class="tag">${esc(p.ageRange)}</span>
+          <span class="tag">${esc(p.age)}</span>
         </div>
       </div>
       <div class="list-actions">
         <div>
-          ${p.oldPrice ? `<div style="font-size:.8rem;color:var(--ink-5);text-decoration:line-through;font-family:var(--font-h)">${p.oldPrice.toLocaleString('vi-VN')}đ</div>` : ''}
+          ${p.old ? `<div style="font-size:.8rem;color:var(--ink-5);text-decoration:line-through;font-family:var(--font-h)">${p.old.toLocaleString('vi-VN')}đ</div>` : ''}
           <div style="font-family:var(--font-h);font-size:1.05rem;font-weight:800;color:var(--orange)">${p.price.toLocaleString('vi-VN')}đ</div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();Cart.add(${p.id})" style="white-space:nowrap">+ Giỏ hàng</button>
