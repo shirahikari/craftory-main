@@ -44,9 +44,29 @@ const PRODUCTS = [
     inc:["128 trang in màu full","50 mẫu origami chia theo cấp độ (dễ → nâng cao)","Hướng dẫn step-by-step bằng hình minh hoạ","Trang tô màu sáng tạo bonus","Giấy can tặng kèm để tập gấp"] },
 ];
 
+/* ── Product normalizer (API → display keys) ── */
+function normalizeProduct(p) {
+  return {
+    id: p.id,
+    name: p.name,
+    em: p.em || p.emoji || '🎨',
+    col: p.col || p.collection || '',
+    cat: p.cat || p.category || '',
+    age: p.age || p.ageRange || '',
+    price: Number(p.price) || 0,
+    old: p.old ?? p.oldPrice ?? null,
+    bg: p.bg || p.bgColor || '#FEF5EA',
+    desc: p.desc || p.description || '',
+    inc: p.inc || p.includes || [],
+    badge: p.badge || null,
+    images: p.images || [],
+  };
+}
+
 /* ── Cart (client-side, localStorage) ────── */
 const Cart = (() => {
   let _items = [];
+  let _catalog = {};
   function _load() { try { _items = JSON.parse(localStorage.getItem('craftory_cart') || '[]'); } catch { _items = []; } }
   function _save() { localStorage.setItem('craftory_cart', JSON.stringify(_items)); _badge(); }
   function _badge() {
@@ -71,11 +91,14 @@ const Cart = (() => {
   return {
     get items() { return _items; },
     reload: _load, updateBadge: _badge,
+    register(products) {
+      products.forEach(p => { _catalog[p.id] = p; });
+    },
     add(pid, qty=1, product) {
       _load();
       // Caller may pass the product explicitly (preferred when sourced from API).
-      // Fallback: look up the seeded PRODUCTS catalog.
-      const src = product || (typeof PRODUCTS !== 'undefined' ? PRODUCTS.find(x=>x.id===pid) : null);
+      // Fallback: check API-loaded catalog, then seeded PRODUCTS array.
+      const src = product || _catalog[pid] || (typeof PRODUCTS !== 'undefined' ? PRODUCTS.find(x=>x.id===pid) : null);
       if (!src) { Toast.show('Không tìm thấy sản phẩm', 'error'); return; }
       const p = _normalize(src);
       const ex = _items.find(x=>x.id===pid);

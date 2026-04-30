@@ -176,10 +176,27 @@ document.getElementById('hdr').innerHTML = renderHeader('shop','../');
 document.getElementById('ftr').innerHTML = renderFooter('../');
 
 const pid = +new URLSearchParams(location.search).get('id');
-const p = PRODUCTS.find(x => x.id === pid);
+let p = null;
 let QTY = 1;
+let thumbData = [];
 
-if (!p) {
+(async function initPage() {
+  if (!pid) { _showNotFound(); return; }
+  try {
+    const [productData, listData] = await Promise.all([
+      API.products.get(pid),
+      API.products.list().catch(() => ({ products: [] })),
+    ]);
+    p = normalizeProduct(productData.product);
+    const allProds = (listData.products || []).map(normalizeProduct);
+    Cart.register(allProds.length ? allProds : [p]);
+    _renderPage(p, allProds);
+  } catch(e) {
+    _showNotFound();
+  }
+})();
+
+function _showNotFound() {
   document.getElementById('pdpWrap').innerHTML = `
   <div style="text-align:center;padding:100px 20px">
     <div style="font-size:4rem;margin-bottom:20px">😕</div>
@@ -187,7 +204,9 @@ if (!p) {
     <p style="color:var(--ink-4);margin-bottom:28px">Sản phẩm này không tồn tại hoặc đã bị xoá.</p>
     <a href="shop.html" class="btn btn-primary btn-lg">← Về cửa hàng</a>
   </div>`;
-} else {
+}
+
+function _renderPage(p, allProds) {
   document.title = p.name + ' — Craftory';
   document.getElementById('bcName').textContent = p.name;
 
@@ -383,24 +402,23 @@ if (!p) {
   </div>`;
 
   // Related products
-  const rel = PRODUCTS.filter(x => x.id !== pid && (x.cat === p.cat || x.col === p.col)).slice(0, 4);
-  document.getElementById('relGrid').innerHTML = rel.length
-    ? rel.map(r => productCardHTML(r, '../')).join('')
-    : PRODUCTS.filter(x => x.id !== pid).slice(0, 4).map(r => productCardHTML(r, '../')).join('');
-}
+  const rel = allProds.filter(x => x.id !== pid && (x.cat === p.cat || x.col === p.col)).slice(0, 4);
+  document.getElementById('relGrid').innerHTML = (rel.length ? rel : allProds.filter(x => x.id !== pid).slice(0, 4))
+    .map(r => productCardHTML(r, '../')).join('');
 
-// KIT folder thumbs for navigation
-const _kitNum  = String(pid).padStart(2,'0');
-const _kitDir  = `../assets/images/product-images/KIT${_kitNum}`;
-const _svgFb   = `../assets/images/products/kit-${pid}.svg`;
-const _thumbBg = [p?.bg||'var(--parchment)', '#F8F8F8', '#FFF0E8', '#F0FDF4'];
-const thumbData = [1,2,3,4].map((n,i) => ({
-  src: `${_kitDir}/KIT${_kitNum}-${n}.png`,
-  svgFallback: _svgFb,
-  em: p?.em || '',
-  bg: _thumbBg[i],
-  isReal: true,
-}));
+  // KIT folder thumbs for navigation
+  const _kitNum  = String(pid).padStart(2,'0');
+  const _kitDir  = `../assets/images/product-images/KIT${_kitNum}`;
+  const _svgFb   = `../assets/images/products/kit-${pid}.svg`;
+  const _thumbBg = [p.bg||'var(--parchment)', '#F8F8F8', '#FFF0E8', '#F0FDF4'];
+  thumbData = [1,2,3,4].map((n,i) => ({
+    src: `${_kitDir}/KIT${_kitNum}-${n}.png`,
+    svgFallback: _svgFb,
+    em: p.em || '',
+    bg: _thumbBg[i],
+    isReal: true,
+  }));
+}
 
 function setThumb(btn, idx) {
   document.querySelectorAll('.pdp-thumb').forEach(b => b.classList.remove('active'));

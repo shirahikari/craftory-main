@@ -574,7 +574,7 @@ function applyFilters() {
   F.priceMin = isNaN(minRaw) ? 0        : Math.max(0, minRaw);
   F.priceMax = isNaN(maxRaw) ? Infinity : Math.max(F.priceMin, maxRaw);
 
-  let list = PRODUCTS.filter(p => {
+  let list = ALL_PRODUCTS.filter(p => {
     if (F.cat !== 'all' && p.cat !== F.cat) return false;
     if (F.badge !== 'all' && p.badge !== F.badge) return false;
     if (F.age === '4-6'  && !p.age.includes('4') && !p.age.includes('5') && !p.age.includes('6')) return false;
@@ -701,7 +701,16 @@ document.getElementById('mobileDrawer')?.addEventListener('click', e => {
   if(e.target===document.getElementById('mobileDrawer')) closeMobileFilter();
 });
 
-applyFilters();
+(async function initShop() {
+  try {
+    const { products } = await API.products.list();
+    ALL_PRODUCTS = products.map(normalizeProduct);
+    Cart.register(ALL_PRODUCTS);
+  } catch(e) {
+    ALL_PRODUCTS = [];
+  }
+  applyFilters();
+})();
 </script>
 </body>
 </html>
