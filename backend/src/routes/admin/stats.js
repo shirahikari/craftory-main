@@ -73,12 +73,12 @@ export default async function adminStatsRoutes(fastify) {
     // Revenue by day (last 7 days)
     const revenueByDay = await fastify.prisma.$queryRaw`
       SELECT
-        DATE(created_at) as date,
+        DATE("createdAt") as date,
         COALESCE(SUM(total), 0)::int as revenue,
         COUNT(*)::int as orders
       FROM "Order"
-      WHERE created_at >= ${day7} AND status != 'cancelled'
-      GROUP BY DATE(created_at)
+      WHERE "createdAt" >= ${day7} AND status != 'cancelled'
+      GROUP BY DATE("createdAt")
       ORDER BY date ASC
     `;
 
