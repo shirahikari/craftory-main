@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Giới thiệu — Craftory</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<div id="login-modal-mount"></div>
+<div id="hdr"></div>
+
+<!-- Mission Banner -->
+<div style="background:linear-gradient(135deg,#1A1209 0%,#2D1B0E 50%,var(--terracotta) 100%);padding:64px 0 56px;position:relative;overflow:hidden">
+  <div style="position:absolute;right:4%;top:50%;transform:translateY(-50%);font-size:14rem;opacity:.04;pointer-events:none;line-height:1">✂</div>
+  <div class="container">
+    <span class="eyebrow" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.15)">Về Craftory</span>
+    <h1 style="color:#fff;margin-top:14px;max-width:580px">Dạy trẻ <em style="font-style:italic;color:var(--terra-3)">sáng tạo bằng đôi bàn tay</em></h1>
+    <p style="color:rgba(255,255,255,.6);max-width:500px;line-height:1.78;margin-top:16px;font-size:.97rem">Craftory ra đời từ một quan sát đơn giản: trẻ em Việt Nam ngày càng dành nhiều thời gian trước màn hình, trong khi niềm vui tạo ra thứ gì đó bằng đôi tay ngày càng ít hơn.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px">
+      <a href="shop.html" class="btn btn-white btn-lg">Xem sản phẩm →</a>
+      <a href="workshop.html" class="btn btn-white-ol btn-lg">Workshop</a>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div style="background:var(--parchment);border-bottom:1.5px solid var(--parchment-2);padding:36px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+      <div style="text-align:center">
+        <div style="font-family:var(--font-display);font-size:2.4rem;font-weight:700;color:var(--orange)">168</div>
+        <div style="font-size:.82rem;color:var(--ink-3);margin-top:5px;font-family:var(--font-h)">Phụ huynh khảo sát</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--font-display);font-size:2.4rem;font-weight:700;color:var(--orange)">60%</div>
+        <div style="font-size:.82rem;color:var(--ink-3);margin-top:5px;font-family:var(--font-h)">Trẻ hoàn thành kit đầu tiên</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--font-display);font-size:2.4rem;font-weight:700;color:var(--orange)">90%</div>
+        <div style="font-size:.82rem;color:var(--ink-3);margin-top:5px;font-family:var(--font-h)">Phụ huynh muốn mua thêm</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--font-display);font-size:2.4rem;font-weight:700;color:var(--orange)">90</div>
+        <div style="font-size:.82rem;color:var(--ink-3);margin-top:5px;font-family:var(--font-h)">Ngày thí điểm</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Why Craftory -->
+<section class="section" id="nghien-cuu">
+  <div class="container">
+    <div class="sh center">
+      <span class="label">Vấn đề chúng tôi giải quyết</span>
+      <h2>Nghiên cứu từ 168 phụ huynh tại TP.HCM</h2>
+      <p class="lead">Trước khi xây dựng Craftory, chúng tôi đi ra ngoài và lắng nghe. Đây là những gì chúng tôi nghe được.</p>
+    </div>
+    <div class="grid-3" style="gap:20px">
+      <div class="card" style="padding:28px">
+        <div style="width:52px;height:52px;background:var(--orange-pale);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px">📱</div>
+        <h3 style="margin-bottom:10px;font-size:1.05rem">Quá nhiều thời gian màn hình</h3>
+        <p style="font-size:.87rem;color:var(--ink-3);line-height:1.75">72% phụ huynh lo ngại bé dành hơn 3 giờ/ngày xem điện thoại. Họ muốn có lựa chọn thay thế đủ hấp dẫn để bé tự chọn bỏ điện thoại xuống.</p>
+      </div>
+      <div class="card" style="padding:28px">
+        <div style="width:52px;height:52px;background:var(--sage-bg);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px">🧩</div>
+        <h3 style="margin-bottom:10px;font-size:1.05rem">Thiếu hướng dẫn rõ ràng</h3>
+        <p style="font-size:.87rem;color:var(--ink-3);line-height:1.75">Nhiều bộ đồ chơi không đi kèm hướng dẫn cụ thể. Bé bắt đầu hứng thú nhưng nhanh nản vì không biết bước tiếp theo — và ba mẹ cũng không biết giúp thế nào.</p>
+      </div>
+      <div class="card" style="padding:28px">
+        <div style="width:52px;height:52px;background:var(--amber-bg);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px">🎖</div>
+        <h3 style="margin-bottom:10px;font-size:1.05rem">Cần cảm giác "tôi làm được"</h3>
+        <p style="font-size:.87rem;color:var(--ink-3);line-height:1.75">Trẻ em cần trải nghiệm thành công cụ thể. Khi bé hoàn thành một tác phẩm bằng đôi tay, sự tự tin đó sẽ lan sang mọi lĩnh vực khác trong cuộc sống.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Story / Timeline + Beliefs -->
+<section class="section bg-cream" id="hanh-trinh">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start">
+      <div>
+        <div class="sh">
+          <span class="label">Hành trình</span>
+          <h2>Từ ý tưởng đến sản phẩm thực</h2>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">Tháng 9 / 2025</div>
+            <div class="timeline-title">Nảy sinh ý tưởng</div>
+            <div class="timeline-desc">Nhóm sinh viên FPT University nhận ra khoảng trống: trẻ em cần hoạt động sáng tạo có hướng dẫn. Bắt đầu khảo sát và phỏng vấn phụ huynh.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Tháng 11 / 2025</div>
+            <div class="timeline-title">Nghiên cứu thực địa</div>
+            <div class="timeline-desc">Khảo sát 168 phụ huynh tại TP.HCM. Phỏng vấn sâu 12 gia đình để hiểu thực sự bé cần gì — không chỉ ba mẹ muốn gì.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Tháng 1 / 2026</div>
+            <div class="timeline-title">Thí điểm 90 ngày</div>
+            <div class="timeline-desc">Ra mắt 3 bộ kit đầu tiên, thử nghiệm với 20 gia đình tình nguyện. 60% trẻ hoàn thành kit đầu tiên ngay trong tuần đầu.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Tháng 3 / 2026</div>
+            <div class="timeline-title">Craftory chính thức ra mắt</div>
+            <div class="timeline-desc">12 sản phẩm, nền tảng web đầy đủ, tích hợp AI trợ lý và hệ thống video hướng dẫn. Nhận đơn hàng toàn quốc.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sh">
+          <span class="label">Sứ mệnh</span>
+          <h2>Những điều chúng tôi tin</h2>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card" style="padding:22px">
+            <div style="display:flex;gap:16px">
+              <div style="font-size:1.8rem;flex-shrink:0;margin-top:2px">✂</div>
+              <div>
+                <h3 style="font-size:1rem;margin-bottom:7px">Tay là bộ não thứ hai</h3>
+                <p style="font-size:.85rem;color:var(--ink-3);line-height:1.7">Nghiên cứu chỉ ra hoạt động thủ công giúp phát triển tư duy không gian, sự kiên nhẫn và lòng tự tin ở trẻ. Đây là trải nghiệm, không phải bài học.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:22px">
+            <div style="display:flex;gap:16px">
+              <div style="font-size:1.8rem;flex-shrink:0;margin-top:2px">🌏</div>
+              <div>
+                <h3 style="font-size:1rem;margin-bottom:7px">Văn hóa Việt trong từng kit</h3>
+                <p style="font-size:.85rem;color:var(--ink-3);line-height:1.7">Mỗi bộ kit mang một câu chuyện Việt Nam — từ đèn lồng Tết, rồng giấy đến cổ tích. Bé học về nguồn gốc của mình qua đôi bàn tay.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:22px">
+            <div style="display:flex;gap:16px">
+              <div style="font-size:1.8rem;flex-shrink:0;margin-top:2px">📱</div>
+              <div>
+                <h3 style="font-size:1rem;margin-bottom:7px">Ít màn hình, nhiều kỷ niệm</h3>
+                <p style="font-size:.85rem;color:var(--ink-3);line-height:1.7">Chúng tôi dùng công nghệ (AI, video) để hỗ trợ trẻ làm nhiều hơn bằng tay — không phải để bé ngồi nhìn thêm màn hình.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team -->
+<section class="section" id="doi-ngu">
+  <div class="container">
+    <div class="sh center">
+      <span class="label">Đội ngũ</span>
+      <h2>Những người xây dựng Craftory</h2>
+      <p class="lead">Nhóm sinh viên Đại học FPT TP.HCM — Khoá SE, ngành Kỹ thuật Phần mềm.</p>
+    </div>
+    <div class="team-grid" id="teamGrid"></div>
+  </div>
+</section>
+
+<!-- Contact CTA -->
+<section class="section bg-cream" id="lien-he-ve">
+  <div class="container" style="max-width:640px;text-align:center">
+    <span class="label" style="justify-content:center">Liên hệ</span>
+    <h2 style="margin-top:12px">Bạn muốn hợp tác hoặc góp ý?</h2>
+    <p style="color:var(--ink-3);margin:14px auto 28px;font-size:.96rem;line-height:1.75;max-width:480px">Chúng tôi luôn mở cửa với phụ huynh muốn góp ý, giáo viên muốn dùng Craftory trong lớp, hay đối tác muốn tổ chức workshop cùng.</p>
+    <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+      <a href="mailto:hello@craftory.vn" class="btn btn-primary btn-lg">📧 hello@craftory.vn</a>
+      <a href="tel:0909000001" class="btn btn-outline btn-lg">📞 0909 000 001</a>
+    </div>
+  </div>
+</section>
+
+<div id="ftr"></div>
+<script src="../assets/js/env.js"></script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+document.getElementById('hdr').innerHTML = renderHeader('about','../');
+document.getElementById('ftr').innerHTML = renderFooter('../');
+
+const TEAM = [
+  { id:'SE194102', name:'Nguyễn Công Phúc',    role:'Product Lead',        dept:'Chiến lược sản phẩm & nghiên cứu người dùng', bio:'Phụ trách định hướng sản phẩm và khảo sát người dùng. Đã phỏng vấn hơn 30 phụ huynh để định hình Craftory.' },
+  { id:'SE194132', name:'Phan Chính Hiếu',     role:'Design Lead',         dept:'UI/UX & thiết kế thương hiệu',                bio:'Xây dựng ngôn ngữ thiết kế ấm áp của Craftory từ logo đến từng trang sản phẩm. Đam mê thiết kế lấy cảm hứng từ thủ công Việt.' },
+  { id:'SE193636', name:'Trần Quốc Trung',          role:'Tech Lead',           dept:'Phát triển nền tảng & tích hợp AI',           bio:'Xây dựng toàn bộ nền tảng website, hệ thống video và tích hợp AI. Quan tâm đến hiệu suất và trải nghiệm người dùng mượt mà.' },
+  { id:'SE192097', name:'Trần Lê Minh Thư',    role:'Content & Marketing', dept:'Nội dung & chiến lược truyền thông',          bio:'Phát triển giọng văn thân thiện của Craftory và lên kế hoạch truyền thông. Phụ trách toàn bộ nội dung hướng dẫn trong các bộ kit.' },
+  { id:'SE190735', name:'Nguyễn Hoàng Phúc',            role:'Operations',          dept:'Vận hành & chuỗi cung ứng',                   bio:'Đảm bảo nguyên vật liệu an toàn cho trẻ em, tối ưu quy trình đóng gói và giao hàng đúng hạn đến khắp cả nước.' },
+  { id:'SE180521', name:'Trần Văn Chung',   role:'Finance & Admin',     dept:'Tài chính & pháp lý',                         bio:'Quản lý tài chính dự án và đảm bảo tính minh bạch. Phụ trách các thủ tục pháp lý để Craftory hoạt động đúng quy định.' },
+];
+
+document.getElementById('teamGrid').innerHTML = TEAM.map(m => `
+<div class="team-card" style="cursor:default">
+  <div class="team-photo-wrap">
+    <img class="team-photo" src="../assets/images/team/${m.id}.png" alt="${m.name}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="team-avatar-fallback" style="display:none;position:absolute;inset:0">
+      <span style="font-family:var(--font-display);font-size:3rem;font-weight:700;color:var(--orange);opacity:.35">${m.name.split(' ').slice(-1)[0].charAt(0)}</span>
+    </div>
+  </div>
+  <div class="team-info">
+    <div class="team-id">${m.id}</div>
+    <div class="team-name">${m.name}</div>
+    <div class="team-role">${m.role}</div>
+    <div style="font-size:.74rem;color:var(--ink-4);font-family:var(--font-h);margin-bottom:9px;line-height:1.45">${m.dept}</div>
+    <div class="team-bio">${m.bio}</div>
+  </div>
+</div>`).join('');
+</script>
+</body>
+</html>
