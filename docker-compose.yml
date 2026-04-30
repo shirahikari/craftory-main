@@ -1,17 +1,38 @@
-
-version: '3'
+version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: craftory
+      POSTGRES_USER: craftory
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-craftory_dev_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U craftory -d craftory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
+    restart: unless-stopped
     env_file:
       - .env
+    environment:
+      DATABASE_URL: postgresql://craftory:${POSTGRES_PASSWORD:-craftory_dev_pass}@postgres:5432/craftory?schema=public
+      NODE_ENV: ${NODE_ENV:-production}
     expose:
       - "3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
-    image: nginx
+    image: nginx:alpine
+    restart: unless-stopped
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ./assets:/usr/share/nginx/html/assets:ro
@@ -23,3 +44,6 @@ services:
       - "443:443"
     depends_on:
       - backend
+
+volumes:
+  postgres_data:

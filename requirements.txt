@@ -1,0 +1,184 @@
+You are working in the GitHub repo: https://github.com/shirahikari/craftory-main (default branch main).
+Your job: transform this project from a mostly-static demo (with localStorage “DB” and insecure admin login) into a professional, LEGO-like storefront with a real backend + database persistence, secure authentication, role-based portals, and a safe chatbot—while keeping costs low (free-tier friendly).
+Non-negotiable goals
+
+    UI/UX: Modern, playful-but-professional “LEGO-like” aesthetic: bold color accents, clean typography, strong spacing rhythm, polished components, micro-interactions, consistent layout, excellent mobile responsiveness.
+    Persistence & stability: Replace demo/localStorage data flows with a real backend + DB.
+    Security: Remove hardcoded credentials and client-side “fake auth”. Implement secure authentication and RBAC.
+    Roles:
+        customer: browse, cart, checkout, order history, chatbot help
+        employee: manage products and orders (operations)
+        admin: manage accounts/roles + dashboard stats
+    Chatbot: Must be backend-mediated; frontend never talks to LLM providers directly; no secrets in frontend.
+    Low cost: Prefer free-tier friendly choices and avoid paid dependencies unless necessary.
+
+Required technical choices (use these unless there’s a strong reason not to)
+
+    Backend: Node.js + Fastify
+    DB: PostgreSQL
+    ORM/migrations/seeding: Prisma
+    Auth: Cookie-based session auth (httpOnly, secure flags in prod) + CSRF protection
+    Session storage: Postgres-backed sessions (avoid Redis to reduce cost/ops)
+    Reverse proxy: Nginx (already used) and keep Docker Compose dev workflow
+    Validation: zod (or similar) and consistent error responses
+    Security headers: helmet
+    Rate limiting on auth + chatbot endpoints
+    Images: initially store image URLs in DB (no upload pipeline yet)
+
+Phase 0 — Audit & plan (must do first)
+
+    Audit current codebase:
+        Site structure: entrypoints, pages/, assets/, existing JS modules (env.js, db.js, app.js), admin page behavior.
+        Current backend in /backend: what it does, endpoints if any, and gaps.
+        Identify any localStorage usage and the current “data model” embedded in JS.
+        Deployment: docker-compose, nginx.conf, ports, TLS assumptions (/etc/letsencrypt mount).
+        Security issues: hardcoded admin creds, client-side auth, secret handling.
+    Output a concise plan/checklist with milestones and which files will change.
+
+Phase 1 — UI/UX redesign system (LEGO-like, but original content preserved)
+
+    Create a design system in CSS:
+        tokens (CSS variables): color palette, typography scale, spacing scale, radii, shadows, z-index, transitions
+        consistent buttons, form fields, cards, badges, modals, toasts, tables
+    Ensure accessibility:
+        focus rings, keyboard navigation, aria attributes
+        good color contrast and readable typography
+    Update key pages to demonstrate:
+        index.html hero, featured products grid, CTA blocks
+        product card component and responsive grids
+    Unify header/footer across pages (render helpers; avoid duplication)
+    Add docs:
+        docs/ui-style-guide.md describing tokens and components
+        docs/ia-and-navigation.md describing nav + page map
+
+Phase 2 — Backend foundation + DB persistence (replace demo DB)
+
+Implement a real backend and DB, dockerized:
+
+    Update docker-compose.yml:
+        add a postgres service with volumes
+        configure backend to connect via env vars
+    Implement backend structure:
+        src/server.ts (or server.js), routes, controllers, services, prisma client, validation, error handler
+    Prisma schema (initial):
+        User: id, email(unique), passwordHash, role(enum: customer/employee/admin), name, status(active/disabled), createdAt, updatedAt
+        Product: id, name, description, price, category, ageRange, images(string[] or separate table), status(published/draft/archived), createdAt, updatedAt
+        Order: id, userId, status(pending/processing/shipped/delivered/cancelled), total, shippingName, shippingPhone, shippingAddress, createdAt, updatedAt
+        OrderItem: id, orderId, productId, qty, unitPrice
+        Workshop: id, title, dateTime, capacity, location, createdAt
+        WorkshopRegistration: id, workshopId, userId(nullable), guestName/guestPhone(optional), createdAt
+        AuditLog: id, actorUserId, action, targetType, targetId, metadata(json), createdAt
+        Session (Postgres-backed sessions): id, userId, expiresAt, data(json), createdAt
+    Seed data:
+        migrate current hardcoded PRODUCTS into DB seed
+    Public API (versioned):
+        GET /api/v1/products
+        GET /api/v1/products/:id
+        GET /api/v1/workshops
+    Produce docs/backend-api.md with endpoint examples.
+
+Phase 3 — Secure authentication + RBAC
+
+Implement:
+
+    POST /api/v1/auth/register
+    POST /api/v1/auth/login
+    POST /api/v1/auth/logout
+    GET /api/v1/auth/me With:
+    argon2 or bcrypt password hashing
+    httpOnly cookie session
+    CSRF protection (double-submit cookie or same-site strategy + token endpoint)
+    rate limit login/register
+    helmet headers
+    RBAC middleware:
+        customer-only endpoints
+        employee+ endpoints
+        admin-only endpoints Frontend:
+    Create login/register UI pages
+    Update header to show Account/Logout
+    Remove any localStorage-based auth logic
+    Do not store long-lived tokens in localStorage Add docs/auth.md explaining the chosen method and security notes.
+
+Phase 4 — Customer commerce features (persistent orders)
+
+Frontend:
+
+    Cart page (can remain client-side cart initially)
+    Checkout page (requires login)
+    My Account pages: profile + order history Backend:
+    POST /api/v1/orders (creates order + items)
+    GET /api/v1/orders (current user) Ensure:
+    authorization: users can only access their orders
+    validation for shipping fields and quantities
+
+Phase 5 — Employee portal (operations)
+
+Build protected employee UI under /pages/employee/:
+
+    Orders list + filter/search + status updates
+    Product CRUD (create/edit/publish/archive; images via URL list for now) Backend endpoints (employee+):
+    GET /api/v1/admin/orders
+    PATCH /api/v1/admin/orders/:id/status
+    CRUD /api/v1/admin/products Ensure employee cannot manage users/roles.
+
+Phase 6 — Admin portal (accounts + stats dashboard)
+
+Build admin UI under /pages/admin/ (replace the current insecure localStorage dashboard):
+
+    Users list
+    Change roles (customer/employee/admin)
+    Deactivate/reactivate accounts
+    Stats dashboard:
+        revenue last 7/30 days
+        orders by status
+        top products by revenue/quantity
+        new users over time Backend endpoints (admin-only):
+    GET /api/v1/admin/users
+    PATCH /api/v1/admin/users/:id
+    GET /api/v1/admin/stats Add audit logs for role changes and important actions.
+
+Phase 7 — Chatbot (safe, backend-mediated, low-cost friendly)
+
+Implement a chat widget on storefront:
+
+    floating button + panel, persisted conversation in-memory per session (optional DB logging with minimal metadata) Backend:
+    POST /api/v1/chat
+    rate limiting + abuse prevention
+    retrieval grounding: query products table by keywords and include top matches in the prompt
+    never expose provider keys to frontend Provider strategy:
+    Support env-configured providers (Anthropic/OpenAI) and optionally local LLM via Ollama if available, but keep the interface pluggable. Add docs/chatbot.md with system prompt + safety constraints:
+    no collecting payment info
+    no revealing secrets
+    no executing admin actions
+
+Reverse proxy integration
+
+Update Nginx config so:
+
+    static frontend served normally
+    /api/ proxied to backend
+    same-origin cookies work
+
+Deliverables / acceptance checks
+
+    App runs locally with docker compose up:
+        frontend accessible
+        backend healthy
+        DB migrations apply
+        seed loads products
+    Customer can: register/login/logout, browse products, add to cart, checkout, see order history
+    Employee can: login, manage products, update order statuses
+    Admin can: manage users/roles, see stats dashboard
+    Chatbot works via backend endpoint and never leaks secrets
+    Remove any hardcoded credentials from frontend and backend
+
+Output format you must follow
+
+    Start by showing the audit findings (Phase 0) and a concrete step-by-step implementation plan.
+    Then implement phases incrementally, keeping the site working.
+    For each phase, list:
+        files changed/added
+        how to test manually
+        any env vars needed
+    Keep code clean and documented.
+

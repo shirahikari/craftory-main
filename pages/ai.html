@@ -97,12 +97,12 @@
 
 <div id="ftr"></div>
 <script src="../assets/js/env.js"></script>
-<script src="../assets/js/db.js"></script>
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/app.js"></script>
 <script>
 document.getElementById('hdr').innerHTML = renderHeader('ai','../');
 document.getElementById('ftr').innerHTML = renderFooter('../');
-document.getElementById('modelLabel').textContent = (window.ENV?.AI_MODEL || 'gpt-4.1-mini') + ' · ShopAIKey';
+document.getElementById('modelLabel').textContent = 'Craftory AI · Backend';
 
 const HISTORY=[];
 let selectedImg=null, recognition=null, isRecording=false;
@@ -156,7 +156,7 @@ Trả lời bằng tiếng Việt, thân thiện, ngắn gọn. Dùng **text** �
 Sản phẩm: ${PRODUCTS.slice(0,6).map(p=>`${p.name} (${p.price.toLocaleString('vi-VN')}đ, ${p.age})`).join(', ')}...
 ${Auth.isLoggedIn()?`Người dùng hiện tại: ${Auth.user.name}.`:'Người dùng chưa đăng nhập.'}`;
 
-    const reply=await callOpenAI(q,sys,HISTORY.slice(-6));
+    const { reply } = await API.chat.send(HISTORY.slice(-6), sys);
     document.getElementById('typing')?.remove();
     HISTORY.push({role:'assistant',content:reply});
     addMsg('ai',reply);

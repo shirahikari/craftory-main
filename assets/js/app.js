@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════
-   CRAFTORY app.js v5.0
-   9 sản phẩm · KIT image system
+   CRAFTORY app.js v6.0
+   Backend-based auth · API-first architecture
    ═══════════════════════════════════════════ */
 
-/* ── Products (9 sản phẩm: KIT01–KIT09) ────── */
+/* ── Products (local catalog for rendering) ── */
 const PRODUCTS = [
   { id:1,  name:"Origami Rừng Nhiệt Đới",   em:"🦜", col:"Jungle Friends",      cat:"kit",  age:"4–6 tuổi",  price:59000,  old:null,   badge:"hot",  bg:"#F0FDF4",
     desc:"Khám phá thế giới động vật nhiệt đới qua nghệ thuật gấp giấy origami. Bé gấp chim toucan, ếch, khỉ và bướm rồi trưng bày trong khung kraft xinh xắn.",
@@ -26,18 +26,18 @@ const PRODUCTS = [
   { id:7,  name:"Vẽ & Tô Màu Khoa Học",    em:"🔭", col:"Science Art",          cat:"kit",  age:"6–9 tuổi",  price:85000,  old:null,   badge:null,   bg:"#EFF6FF",
     desc:"Tô màu những bức vẽ khoa học thú vị — hệ mặt trời, bộ xương khủng long, cơ thể người và thế giới đại dương. Học khoa học bằng màu sắc và đôi bàn tay.",
     inc:["4 tờ tranh khoa học khổ lớn (hệ mặt trời, khủng long, cơ thể người, đại dương)","Bộ bút sáp 12 màu không độc","Bút lông màu 6 màu tươi","Nhãn dán ngôi sao khen thưởng","Thước kẻ trong suốt","Sách khoa học mini 20 trang"] },
-  { id:8,  name:"Đồ Chơi Gỗ Chuyển Động",  em:"🚗", col:"STEM Builders",        cat:"kit",  age:"6–9 tuổi", price:79000,  old:95000,  badge:"sale", bg:"#FEF3C7",
+  { id:8,  name:"Đồ Chơi Gỗ Chuyển Động",  em:"🚗", col:"STEM Builders",        cat:"kit",  age:"6–9 tuổi",  price:79000,  old:95000,  badge:"sale", bg:"#FEF3C7",
     desc:"Lắp ráp và sơn xe ô tô đồ chơi bằng gỗ birch thật. Từ mảnh gỗ, bánh xe nhựa đến dây cao su — trải nghiệm STEM thực chiến: thiết kế, lắp ghép, hoàn thiện.",
     inc:["Các mảnh gỗ birch cắt sẵn (thân xe)","4 bánh xe nhựa màu (đỏ, vàng, xanh lá, xanh dương)","2 trục quay nhựa","Dây cao su","Đinh nhỏ","Búa nhựa mini an toàn","Màu nước 4 màu & cọ vẽ","Giấy hướng dẫn lắp ráp xe & máy bay"] },
-  { id:9,  name:"Nến & Xà Phòng Thủ Công", em:"🕯️", col:"Little Botanist",  cat:"kit",  age:"9–12 tuổi", price:60000,  old:null,   badge:null,   bg:"#F5F0FF",
+  { id:9,  name:"Nến & Xà Phòng Thủ Công", em:"🕯️", col:"Little Botanist",      cat:"kit",  age:"9–12 tuổi", price:60000,  old:null,   badge:null,   bg:"#F5F0FF",
     desc:"Tự tay làm nến đậu nành và xà phòng glycerin thơm từ hương liệu thiên nhiên. Bé học về khoa học chất liệu và trải nghiệm niềm vui tạo ra sản phẩm thực sự dùng được.",
     inc:["Sáp đậu nành tự nhiên (đủ làm 2 nến)","2 lọ hương liệu thiên nhiên (oải hương & cam)","4 viên thuốc nhuộm màu an toàn (hồng, vàng, xanh, tím)","2 tim nến cotton đế kim loại","2 cốc đổ nến nhựa trong","Que khuấy gỗ","2 khuôn silicon vuông (xà phòng)","Nền xà phòng glycerin trong","Thẻ hướng dẫn an toàn & từng bước"] },
-  { id:10,  name:"Sách Origami Cơ Bản",      em:"📗", col:"Giấy hướng dẫn",      cat:"book", age:"4–9 tuổi",  price:60000,  old:null,   badge:null,   bg:"#F0FDF4",
-  desc:"50 mẫu origami từ dễ đến khó với hướng dẫn từng bước bằng hình ảnh màu sắc. Cuốn sách bạn đồng hành lý tưởng cho bé bắt đầu hành trình gấp giấy.",
-  inc:["128 trang in màu full","50 mẫu origami chia theo cấp độ (dễ → nâng cao)","Hướng dẫn step-by-step bằng hình minh hoạ","Trang tô màu sáng tạo bonus","Giấy can tặng kèm để tập gấp"] },
+  { id:10, name:"Sách Origami Cơ Bản",      em:"📗", col:"Giấy hướng dẫn",      cat:"book", age:"4–9 tuổi",  price:60000,  old:null,   badge:null,   bg:"#F0FDF4",
+    desc:"50 mẫu origami từ dễ đến khó với hướng dẫn từng bước bằng hình ảnh màu sắc. Cuốn sách bạn đồng hành lý tưởng cho bé bắt đầu hành trình gấp giấy.",
+    inc:["128 trang in màu full","50 mẫu origami chia theo cấp độ (dễ → nâng cao)","Hướng dẫn step-by-step bằng hình minh hoạ","Trang tô màu sáng tạo bonus","Giấy can tặng kèm để tập gấp"] },
 ];
 
-/* ── Cart ────────────────────────────────── */
+/* ── Cart (client-side, localStorage) ────── */
 const Cart = (() => {
   let _items = [];
   function _load() { try { _items = JSON.parse(localStorage.getItem('craftory_cart') || '[]'); } catch { _items = []; } }
@@ -55,7 +55,7 @@ const Cart = (() => {
       const p = PRODUCTS.find(x=>x.id===pid); if(!p) return;
       const ex = _items.find(x=>x.id===pid);
       if(ex) ex.qty=(ex.qty||1)+qty; else _items.push({...p,qty});
-      _save(); Toast.show(`🛒 Đã thêm "${p.name}" vào giỏ`, 'success');
+      _save(); Toast.show(`Đã thêm "${p.name}" vào giỏ`, 'success');
     },
     remove(pid) { _load(); _items=_items.filter(x=>x.id!==pid); _save(); },
     setQty(pid,qty) { _load(); const i=_items.find(x=>x.id===pid); if(i) i.qty=Math.max(1,qty); _save(); },
@@ -65,19 +65,13 @@ const Cart = (() => {
   };
 })();
 
-/* ── Auth ────────────────────────────────── */
+/* ── Auth (backend session-based) ────────── */
 const Auth = (() => {
-  const SESSION_KEY = 'craftory_session';
   let _user = null;
-
-  function _load() {
-    try { _user = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }
-    catch { _user = null; }
-  }
-  _load();
+  let _ready = false;
+  const _callbacks = [];
 
   function _updateUI() {
-    _load();
     const loginBtns = document.querySelectorAll('.btn-login');
     const userBtns  = document.querySelectorAll('.nav-user');
     if (_user) {
@@ -86,8 +80,8 @@ const Auth = (() => {
         b.classList.add('visible');
         const av = b.querySelector('.nav-user-avatar');
         const nm = b.querySelector('.nav-user-name');
-        if(av) av.textContent = _user.avatar || _user.name.charAt(0).toUpperCase();
-        if(nm) nm.textContent = _user.name.split(' ').slice(-1)[0];
+        if (av) av.textContent = _user.name.charAt(0).toUpperCase();
+        if (nm) nm.textContent = _user.name.split(' ').slice(-1)[0];
       });
     } else {
       loginBtns.forEach(b => b.style.display = '');
@@ -95,24 +89,52 @@ const Auth = (() => {
     }
   }
 
+  // Initialize from server session on page load
+  async function _init() {
+    if (_ready) return;
+    try {
+      if (typeof API !== 'undefined') {
+        const data = await API.auth.me();
+        _user = data.user || null;
+      }
+    } catch { _user = null; }
+    _ready = true;
+    _updateUI();
+    _callbacks.forEach(fn => fn(_user));
+  }
+
   return {
     get user() { return _user; },
     isLoggedIn() { return !!_user; },
-    isAdmin() { return _user?.role === 'admin'; },
+    isAdmin()    { return _user?.role === 'admin'; },
+    isEmployee() { return _user?.role === 'employee' || _user?.role === 'admin'; },
 
-    login(userObj) {
-      _user = userObj;
-      localStorage.setItem(SESSION_KEY, JSON.stringify(userObj));
-      _updateUI();
+    init: _init,
+
+    onReady(fn) {
+      if (_ready) fn(_user);
+      else _callbacks.push(fn);
     },
-    logout() {
+
+    async login(email, password) {
+      const data = await API.auth.login(email, password);
+      _user = data.user;
+      _updateUI();
+      if (typeof onAuthChange === 'function') onAuthChange(_user);
+      return data;
+    },
+
+    async logout() {
+      try { await API.auth.logout(); } catch {}
       _user = null;
-      localStorage.removeItem(SESSION_KEY);
+      _ready = false;
       _updateUI();
       Toast.show('Đã đăng xuất. Hẹn gặp lại!');
-      if (typeof onAuthChange === 'function') onAuthChange();
+      if (typeof onAuthChange === 'function') onAuthChange(null);
     },
-    updateUI: () => _updateUI(),
+
+    setUser(user) { _user = user; _updateUI(); },
+    updateUI: _updateUI,
   };
 })();
 
@@ -169,28 +191,28 @@ const VideoModal = {
     const isPlaying = btn.textContent === '⏸';
     btn.textContent = isPlaying ? '▶' : '⏸';
     btn.style.background = isPlaying ? 'var(--terracotta)' : 'var(--sage)';
-    if(!isPlaying) Toast.show('▶ Đang phát video...', 'success');
+    if(!isPlaying) Toast.show('Đang phát video...', 'success');
   }
 };
 
 /* ── Header ──────────────────────────────── */
 function renderHeader(active, base='') {
   const links = [
-    { href:`${base}index.html`,             label:'Trang chủ',      key:'home' },
-    { href:`${base}pages/shop.html`,        label:'Sản phẩm',       key:'shop' },
-    { href:`${base}pages/workshop.html`,    label:'Workshop',       key:'workshop' },
-    { href:`${base}pages/ai.html`,          label:'Trợ lý AI',      key:'ai' },
-    { href:`${base}pages/about.html`,       label:'Giới thiệu',     key:'about' },
-    { href:`${base}pages/my-products.html`, label:'Của tôi',        key:'myproducts' },
+    { href:`${base}index.html`,             label:'Trang chủ',  key:'home' },
+    { href:`${base}pages/shop.html`,        label:'Sản phẩm',   key:'shop' },
+    { href:`${base}pages/workshop.html`,    label:'Workshop',   key:'workshop' },
+    { href:`${base}pages/ai.html`,          label:'Trợ lý AI',  key:'ai' },
+    { href:`${base}pages/about.html`,       label:'Giới thiệu', key:'about' },
+    { href:`${base}pages/account.html`,     label:'Của tôi',    key:'account' },
   ];
-  const navItems   = links.map(l=>`<a href="${l.href}" class="${active===l.key?'active':''}">${l.label}</a>`).join('');
+  const navItems    = links.map(l=>`<a href="${l.href}" class="${active===l.key?'active':''}">${l.label}</a>`).join('');
   const drawerItems = links.map(l=>`<a href="${l.href}" class="${active===l.key?'active':''}">${l.label}</a>`).join('');
   return `
   <header class="site-header">
     <div class="container navbar">
       <a class="brand" href="${base}index.html">
         <img class="brand-logo" src="${base}assets/images/logo.png" alt="Craftory" loading="eager"
-          onerror="this.style.display='none';document.getElementById('bfb_'+Math.random().toString(36).slice(2)).style.display='flex'">
+          onerror="this.style.display='none'">
       </a>
       <nav class="nav-links">${navItems}</nav>
       <div class="nav-right">
@@ -224,25 +246,32 @@ function toggleDrawer() {
 
 function showUserMenu() {
   if (!Auth.isLoggedIn()) { LoginModal.open(); return; }
-  // Inline mini menu
   const existing = document.getElementById('userMenuPopup');
   if (existing) { existing.remove(); return; }
   const btn = document.getElementById('navUser');
   const menu = document.createElement('div');
   menu.id = 'userMenuPopup';
   menu.style.cssText = `position:fixed;top:${btn.getBoundingClientRect().bottom+6}px;right:${window.innerWidth-btn.getBoundingClientRect().right}px;background:var(--surface);border:1px solid var(--parchment);border-radius:var(--r-lg);box-shadow:var(--sh-lg);z-index:999;min-width:180px;overflow:hidden`;
+
+  const isAdmin = Auth.isAdmin();
+  const isEmp = Auth.isEmployee();
+  const prefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
   const items = [
-    { label:'📦 Sản phẩm của tôi', href:'pages/my-products.html' },
-    { label:'🛒 Giỏ hàng', href:'pages/cart.html' },
-    ...(Auth.isAdmin() ? [{ label:'⚙️ Quản trị', href:(window.location.pathname.includes('/pages/')?'':'pages/')+'admin/index.html' }] : []),
+    { label:'📦 Đơn hàng của tôi', href:`${prefix}account.html` },
+    { label:'🛒 Giỏ hàng', href:`${prefix}cart.html` },
+    ...(isEmp ? [{ label:'👷 Cổng nhân viên', href:`${prefix}employee/orders.html` }] : []),
+    ...(isAdmin ? [{ label:'⚙️ Quản trị', href:`${prefix}admin/index.html` }] : []),
     { label:'🚪 Đăng xuất', action:'Auth.logout()' },
   ];
+
   menu.innerHTML = `
     <div style="padding:12px 16px 8px;border-bottom:1px solid var(--parchment);font-size:.82rem">
       <strong>${Auth.user.name}</strong>
       <div style="font-size:.72rem;color:var(--ink-3);margin-top:2px">${Auth.user.email}</div>
+      <div style="font-size:.68rem;color:var(--orange);font-weight:700;margin-top:3px;text-transform:uppercase">${Auth.user.role}</div>
     </div>
     ${items.map(i=>`<div onclick="${i.href?`location.href='${i.href}'`:i.action};document.getElementById('userMenuPopup')?.remove()" style="padding:10px 16px;font-size:.84rem;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--cream-2)'" onmouseout="this.style.background=''">${i.label}</div>`).join('')}`;
+
   document.body.appendChild(menu);
   const close = e => { if(!menu.contains(e.target)&&!btn.contains(e.target)){ menu.remove(); document.removeEventListener('click',close); } };
   setTimeout(()=>document.addEventListener('click',close), 10);
@@ -263,7 +292,6 @@ function renderFooter(base='') {
               <span class="footer-logo-fallback-name">Craftory</span>
             </span>
           </div>
-          <div class="footer-brand-name" style="display:none">Craftory</div>
           <p class="footer-desc">Học thủ công bằng tay cho trẻ em.<br>Ít màn hình — nhiều sáng tạo hơn.</p>
           <div class="footer-socials">
             <a class="footer-social" title="Facebook" href="https://facebook.com/craftory.vn" target="_blank" rel="noopener">📘</a>
@@ -276,21 +304,18 @@ function renderFooter(base='') {
           <h4>Sản phẩm</h4>
           <a href="${base}pages/shop.html">Bộ kit thủ công</a>
           <a href="${base}pages/shop.html">Giấy hướng dẫn</a>
-          <a href="${base}pages/shop.html">Gói thành viên</a>
           <a href="${base}pages/workshop.html">Workshop</a>
         </div>
         <div class="footer-col">
           <h4>Hỗ trợ</h4>
           <a href="${base}pages/ai.html">Trợ lý AI</a>
           <a href="${base}pages/faq.html">Câu hỏi thường gặp</a>
-          <a href="${base}pages/returns.html">Chính sách đổi trả</a>
           <a href="${base}pages/contact.html">Liên hệ</a>
         </div>
         <div class="footer-col">
           <h4>Về chúng tôi</h4>
-          <a href="${base}pages/about.html#hanh-trinh">Câu chuyện Craftory</a>
+          <a href="${base}pages/about.html">Câu chuyện Craftory</a>
           <a href="${base}pages/about.html#doi-ngu">Đội ngũ</a>
-          <a href="${base}pages/faq.html">Câu hỏi thường gặp</a>
           <a href="${base}pages/contact.html">Liên hệ</a>
         </div>
       </div>
@@ -303,7 +328,7 @@ function renderFooter(base='') {
   </footer>`;
 }
 
-/* ── Login Modal ─────────────────────────── */
+/* ── Login Modal (backend auth) ───────────── */
 const LoginModal = {
   _rendered: false,
   open(tab='login') {
@@ -329,7 +354,7 @@ const LoginModal = {
           <div style="text-align:center;margin-bottom:22px">
             <div style="font-size:2.8rem;margin-bottom:8px">👋</div>
             <p class="modal-title" style="margin-bottom:4px">Chào mừng trở lại</p>
-            <p class="modal-subtitle">Đăng nhập để xem video hướng dẫn và dùng AI nâng cao</p>
+            <p class="modal-subtitle">Đăng nhập để xem đơn hàng và dùng trợ lý AI</p>
           </div>
           <div class="form-group">
             <label class="form-label">Email <span class="required">*</span></label>
@@ -343,10 +368,9 @@ const LoginModal = {
             </div>
           </div>
           <div id="lm-err" style="display:none" class="form-error mb-12"></div>
-          <button class="btn btn-primary btn-block" style="margin-top:4px" onclick="LoginModal._doLogin()">Đăng nhập →</button>
+          <button class="btn btn-primary btn-block" id="lm-submit" style="margin-top:4px" onclick="LoginModal._doLogin()">Đăng nhập →</button>
           <div class="form-divider">chưa có tài khoản?</div>
           <button class="btn btn-ghost btn-block" onclick="LoginModal._show('register')">Tạo tài khoản miễn phí</button>
-          <p style="font-size:.7rem;color:var(--ink-5);text-align:center;margin-top:14px;padding:8px;background:var(--parchment);border-radius:8px;line-height:1.5">Demo admin: admin@craftory.vn / craftory@2026</p>
         </div>
         <!-- Register -->
         <div id="lm-reg" style="display:none">
@@ -367,12 +391,12 @@ const LoginModal = {
             <label class="form-label">Mật khẩu <span class="required">*</span></label>
             <div class="input-group">
               <input class="form-input" type="password" id="lm-rpass" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password">
-              <button class="input-group-btn" type="button" onclick="LoginModal._togglePass('lm-rpass',this)" tabindex="-1" title="Hiện/ẩn mật khẩu">👁</button>
+              <button class="input-group-btn" type="button" onclick="LoginModal._togglePass('lm-rpass',this)" tabindex="-1">👁</button>
             </div>
-            <div class="form-hint">Ít nhất 6 ký tự, nên có chữ hoa và số</div>
+            <div class="form-hint">Ít nhất 6 ký tự</div>
           </div>
           <div id="lm-rerr" style="display:none" class="form-error mb-12"></div>
-          <button class="btn btn-primary btn-block" style="margin-top:4px" onclick="LoginModal._doReg()">Đăng ký ngay →</button>
+          <button class="btn btn-primary btn-block" id="lm-rsubmit" style="margin-top:4px" onclick="LoginModal._doReg()">Đăng ký ngay →</button>
           <div class="form-divider">đã có tài khoản?</div>
           <button class="btn btn-ghost btn-block" onclick="LoginModal._show('login')">← Đăng nhập</button>
         </div>
@@ -383,53 +407,75 @@ const LoginModal = {
   _togglePass(id, btn) {
     const el = document.getElementById(id);
     if (!el) return;
-    const isText = el.type === 'text';
-    el.type = isText ? 'password' : 'text';
-    btn.style.opacity = isText ? '0.5' : '1';
+    el.type = el.type === 'text' ? 'password' : 'text';
+    btn.style.opacity = el.type === 'password' ? '1' : '0.5';
   },
-  _doLogin() {
-    const email = document.getElementById('lm-email').value.trim();
-    const pass  = document.getElementById('lm-pass').value;
-    const errEl = document.getElementById('lm-err');
+  async _doLogin() {
+    const email  = document.getElementById('lm-email').value.trim();
+    const pass   = document.getElementById('lm-pass').value;
+    const errEl  = document.getElementById('lm-err');
+    const submit = document.getElementById('lm-submit');
     errEl.style.display = 'none';
-    if (!email || !pass) { errEl.textContent = 'Vui lòng điền đầy đủ thông tin.'; errEl.style.display = 'block'; return; }
-    const result = DB.users.login(email, pass);
-    if (result.error) { errEl.textContent = result.error; errEl.style.display = 'block'; return; }
-    Auth.login(result.user);
-    Cart.updateBadge();
-    this.close();
-    Toast.show(`Chào ${result.user.name}! 👋`, 'success');
-    if (typeof onAuthChange === 'function') onAuthChange();
-    if (result.user.role === 'admin') {
-      setTimeout(() => {
-        if (confirm('Bạn đang đăng nhập với quyền Admin. Chuyển đến trang quản trị?')) location.href = 'pages/admin/index.html';
-      }, 400);
+    if (!email || !pass) { errEl.textContent='Vui lòng điền đầy đủ thông tin.'; errEl.style.display='block'; return; }
+    submit.disabled = true; submit.textContent = 'Đang xử lý...';
+    try {
+      const { user } = await Auth.login(email, pass);
+      Cart.updateBadge();
+      this.close();
+      Toast.show(`Chào ${user.name}!`, 'success');
+      if (user.role === 'admin') {
+        setTimeout(() => {
+          if (confirm('Bạn đang đăng nhập với quyền Admin. Chuyển đến trang quản trị?')) {
+            const pre = window.location.pathname.includes('/pages/') ? '' : 'pages/';
+            location.href = pre + 'admin/index.html';
+          }
+        }, 400);
+      } else if (user.role === 'employee') {
+        setTimeout(() => {
+          if (confirm('Bạn đang đăng nhập với quyền nhân viên. Chuyển đến cổng nhân viên?')) {
+            const pre = window.location.pathname.includes('/pages/') ? '' : 'pages/';
+            location.href = pre + 'employee/orders.html';
+          }
+        }, 400);
+      }
+    } catch(err) {
+      errEl.textContent = err.message || 'Đăng nhập thất bại.';
+      errEl.style.display = 'block';
+    } finally {
+      submit.disabled = false; submit.textContent = 'Đăng nhập →';
     }
   },
-  _doReg() {
-    const name  = document.getElementById('lm-rname').value.trim();
-    const email = document.getElementById('lm-remail').value.trim();
-    const pass  = document.getElementById('lm-rpass').value;
-    const errEl = document.getElementById('lm-rerr');
+  async _doReg() {
+    const name   = document.getElementById('lm-rname').value.trim();
+    const email  = document.getElementById('lm-remail').value.trim();
+    const pass   = document.getElementById('lm-rpass').value;
+    const errEl  = document.getElementById('lm-rerr');
+    const submit = document.getElementById('lm-rsubmit');
     errEl.style.display = 'none';
-    if (!name || !email || !pass) { errEl.textContent = 'Vui lòng điền đầy đủ thông tin.'; errEl.style.display = 'block'; return; }
-    if (pass.length < 6) { errEl.textContent = 'Mật khẩu phải có ít nhất 6 ký tự.'; errEl.style.display = 'block'; return; }
-    if (!/\S+@\S+\.\S+/.test(email)) { errEl.textContent = 'Email không đúng định dạng.'; errEl.style.display = 'block'; return; }
-    const result = DB.users.create({ email, password: pass, name });
-    if (result.error) { errEl.textContent = result.error; errEl.style.display = 'block'; return; }
-    Auth.login(result.user);
-    Cart.updateBadge();
-    this.close();
-    Toast.show(`Đăng ký thành công! Chào ${name} 🎉`, 'success');
-    if (typeof onAuthChange === 'function') onAuthChange();
+    if (!name||!email||!pass) { errEl.textContent='Vui lòng điền đầy đủ thông tin.'; errEl.style.display='block'; return; }
+    if (pass.length < 6) { errEl.textContent='Mật khẩu phải có ít nhất 6 ký tự.'; errEl.style.display='block'; return; }
+    if (!/\S+@\S+\.\S+/.test(email)) { errEl.textContent='Email không đúng định dạng.'; errEl.style.display='block'; return; }
+    submit.disabled = true; submit.textContent = 'Đang tạo tài khoản...';
+    try {
+      const { user } = await API.auth.register(name, email, pass);
+      Auth.setUser(user);
+      Cart.updateBadge();
+      this.close();
+      Toast.show(`Đăng ký thành công! Chào ${name} 🎉`, 'success');
+      if (typeof onAuthChange === 'function') onAuthChange(user);
+    } catch(err) {
+      errEl.textContent = err.message || 'Đăng ký thất bại.';
+      errEl.style.display = 'block';
+    } finally {
+      submit.disabled = false; submit.textContent = 'Đăng ký ngay →';
+    }
   },
 };
 
 /* ── Product Card HTML ───────────────────── */
 function productCardHTML(p, base='') {
   const badgeLabel = p.badge==='hot'?'🔥 Bán chạy':p.badge==='new'?'✨ Mới':p.badge==='sale'?'🏷 Giảm giá':'';
-  const kitNum = String(p.id).padStart(2, '0');
-  // Priority: KITxx/KITxx-1.png → SVG illustration → emoji
+  const kitNum = String(p.id).padStart(2,'0');
   const pngSrc = `${base}assets/images/product-images/KIT${kitNum}/KIT${kitNum}-1.png`;
   const svgSrc = `${base}assets/images/products/kit-${p.id}.svg`;
   return `
@@ -456,70 +502,8 @@ function productCardHTML(p, base='') {
 }
 
 /* ── Init ────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   Cart.updateBadge();
-  Auth.updateUI();
+  // Load auth state from backend session cookie
+  await Auth.init();
 });
-
-/* ── AI Helper — callOpenAI (ShopAIKey compatible) ──────── */
-async function callOpenAI(userMessage, systemPrompt, history = []) {
-  const apiKey  = window.ENV?.AI_API_KEY  || '';
-  const model   = window.ENV?.AI_MODEL    || 'gpt-4.1-mini';
-  const useBack = window.ENV?.USE_BACKEND;
-  const backend = window.ENV?.BACKEND_URL || 'http://localhost:3000';
-
-  /* ShopAIKey endpoints — fully OpenAI-compatible format
-   * Primary:  https://api.shopaikey.com/v1/chat/completions
-   * Fallback: https://api-v2.shopaikey.com/v1/chat/completions
-   */
-  const endpoint  = window.ENV?.AI_ENDPOINT        || 'https://api.shopaikey.com/v1/chat/completions';
-  const endpointB = window.ENV?.AI_ENDPOINT_BACKUP || 'https://api-v2.shopaikey.com/v1/chat/completions';
-
-  const messages = [
-    ...history.filter(m => m.role && m.content),
-    { role: 'user', content: userMessage },
-  ];
-  const body = JSON.stringify({
-    model,
-    max_tokens: 1024,
-    messages: systemPrompt
-      ? [{ role: 'system', content: systemPrompt }, ...messages]
-      : messages,
-  });
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + apiKey,
-  };
-
-  // Use backend proxy if configured
-  if (useBack) {
-    const r = await fetch(backend + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, systemPrompt }),
-    });
-    const d = await r.json();
-    if (d.error) throw new Error(d.error);
-    return d.reply;
-  }
-
-  if (!apiKey) throw new Error('Chưa cấu hình API key. Điền key từ shopaikey.com vào assets/js/env.js.');
-
-  // Try primary endpoint, fallback to backup on network error
-  async function _call(url) {
-    const r = await fetch(url, { method: 'POST', headers, body });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error?.message || `Lỗi ${r.status} từ AI`);
-    return d.choices?.[0]?.message?.content?.trim() || 'Xin lỗi, không nhận được phản hồi.';
-  }
-
-  try {
-    return await _call(endpoint);
-  } catch (err) {
-    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      console.warn('[Craftory AI] Primary endpoint failed, trying backup…');
-      return await _call(endpointB);
-    }
-    throw err;
-  }
-}

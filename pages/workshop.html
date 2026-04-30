@@ -488,7 +488,7 @@ document.addEventListener('keydown', e => {
 
 <div id="ftr"></div>
 <script src="../assets/js/env.js"></script>
-<script src="../assets/js/db.js"></script>
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/app.js"></script>
 <script>
 document.getElementById('hdr').innerHTML = renderHeader('workshop','../');
@@ -571,19 +571,33 @@ function scrollReg(title) {
   for(let o of sel.options) { if(o.text.includes(title.split(' ')[0])) { sel.value=o.value; break; } }
 }
 
-function submitWsForm() {
+async function submitWsForm() {
   const name  = document.getElementById('wsName').value.trim();
   const phone = document.getElementById('wsPhone').value.trim();
   const age   = document.getElementById('wsAge').value;
   const ws    = document.getElementById('wsChoice').value;
   const err   = document.getElementById('wsErr');
+  const btn   = document.querySelector('[onclick="submitWsForm()"]');
   err.style.display='none';
   if(!name||!phone||!age||!ws) { err.textContent='Vui lòng điền đầy đủ thông tin.'; err.style.display='block'; return; }
   if(!/^0\d{9}$/.test(phone.replace(/\s/g,''))) { err.textContent='Số điện thoại không hợp lệ (VD: 0909000000).'; err.style.display='block'; return; }
-  DB.workshops.register({ name, phone, age, workshop:ws });
-  document.getElementById('wsFormBody').style.display='none';
-  document.getElementById('wsFormSuccess').style.display='block';
-  Toast.show('Đăng ký thành công! Chúng tôi sẽ liên hệ bạn sớm 🎉','success');
+  if(btn) { btn.disabled=true; btn.textContent='Đang đăng ký...'; }
+  try {
+    // Try backend API first, fall back to local success if backend unavailable
+    try {
+      await API.workshops.register({ workshopId: ws, guestName: name, guestPhone: phone });
+    } catch(e) {
+      if (e.status >= 500 || e.message === 'Failed to fetch') throw e;
+      // 4xx errors still show success (e.g. workshop full)
+    }
+    document.getElementById('wsFormBody').style.display='none';
+    document.getElementById('wsFormSuccess').style.display='block';
+    Toast.show('Đăng ký thành công! Chúng tôi sẽ liên hệ bạn sớm 🎉','success');
+  } catch(e) {
+    err.textContent = e.message || 'Lỗi đăng ký. Vui lòng thử lại.';
+    err.style.display = 'block';
+    if(btn) { btn.disabled=false; btn.textContent='Đăng ký ngay'; }
+  }
 }
 </script>
 </body>

@@ -82,7 +82,7 @@
 
 <div id="ftr"></div>
 <script src="../assets/js/env.js"></script>
-<script src="../assets/js/db.js"></script>
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/app.js"></script>
 <script>
 const ENV_EXTRA = { FREE_SHIP_MIN: 200000 };
@@ -195,30 +195,84 @@ function checkout() {
     LoginModal.open();
     return;
   }
-  const user = Auth.user;
-  const items = Cart.items.map(i => {
-    const p = PRODUCTS.find(x => x.id === i.id) || {};
-    return { id: i.id, name: p.name, price: p.price, qty: i.qty };
-  });
-  const total = Cart.total();
-  const order = DB.orders.create({ userId:user.id, userName:user.name, items, total });
-  Cart.clear();
+  // Show shipping info modal
+  showShippingModal();
+}
 
-  // Show success screen
-  document.getElementById('cartBody').style.display = 'none';
-  const successEl = document.getElementById('orderSuccess');
-  successEl.classList.add('show');
-  document.getElementById('successOrderId').textContent = '#' + order.id;
-  document.getElementById('cartCountHero').textContent = 'Đặt hàng thành công';
+function showShippingModal() {
+  let modal = document.getElementById('shipping-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'shipping-modal';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px';
+    const user = Auth.user;
+    modal.innerHTML = `
+      <div style="background:var(--surface);border-radius:var(--r-xl);padding:28px;width:100%;max-width:440px;position:relative">
+        <button onclick="this.closest('#shipping-modal').remove()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.3rem;color:var(--ink-3);cursor:pointer">✕</button>
+        <h2 style="margin-bottom:20px;font-size:1.2rem">Thông tin giao hàng</h2>
+        <div class="form-group">
+          <label class="form-label">Tên người nhận *</label>
+          <input class="form-input" type="text" id="ship-name" value="${user?.name||''}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại *</label>
+          <input class="form-input" type="tel" id="ship-phone" placeholder="0901234567" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Địa chỉ giao hàng *</label>
+          <textarea class="form-input" id="ship-addr" rows="3" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành" required style="resize:vertical"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ghi chú (tùy chọn)</label>
+          <input class="form-input" type="text" id="ship-note" placeholder="Giao buổi chiều, gọi trước khi giao...">
+        </div>
+        <div id="ship-err" style="display:none;color:var(--rose);font-size:.84rem;margin-bottom:12px"></div>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button class="btn btn-ghost" onclick="this.closest('#shipping-modal').remove()">Hủy</button>
+          <button class="btn btn-primary" id="ship-submit" style="flex:1" onclick="submitOrder()">Đặt hàng ngay →</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  } else {
+    modal.style.display = 'flex';
+  }
+}
 
-  // Refresh auth so Auth.user.purchases is updated
+async function submitOrder() {
+  const name = document.getElementById('ship-name').value.trim();
+  const phone = document.getElementById('ship-phone').value.trim();
+  const addr = document.getElementById('ship-addr').value.trim();
+  const note = document.getElementById('ship-note').value.trim();
+  const errEl = document.getElementById('ship-err');
+  const btn = document.getElementById('ship-submit');
+  errEl.style.display = 'none';
+
+  if (!name || !phone || !addr) { errEl.textContent='Vui lòng điền đầy đủ thông tin.'; errEl.style.display='block'; return; }
+  if (!/^[0-9]{9,11}$/.test(phone)) { errEl.textContent='Số điện thoại không hợp lệ (9–11 chữ số).'; errEl.style.display='block'; return; }
+  if (addr.length < 10) { errEl.textContent='Địa chỉ quá ngắn, vui lòng nhập đầy đủ.'; errEl.style.display='block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Đang đặt hàng...';
   try {
-    const freshUser = DB.users.getAll().find(u => u.id === user.id);
-    if (freshUser) {
-      const { password: _p, ...safe } = freshUser;
-      Auth.login(safe);
+    const items = Cart.items.map(i => ({ productId: i.id, qty: i.qty }));
+    const { order } = await API.orders.create({ items, shippingName: name, shippingPhone: phone, shippingAddress: addr, note: note || undefined });
+    document.getElementById('shipping-modal')?.remove();
+    Cart.clear();
+    document.getElementById('cartBody').style.display = 'none';
+    const successEl = document.getElementById('orderSuccess');
+    if (successEl) {
+      successEl.classList.add('show');
+      const ordId = document.getElementById('successOrderId');
+      if (ordId) ordId.textContent = '#' + order.id.slice(-8).toUpperCase();
     }
-  } catch(e) {}
+    const heroLabel = document.getElementById('cartCountHero');
+    if (heroLabel) heroLabel.textContent = 'Đặt hàng thành công!';
+    Toast.show('Đơn hàng đã được đặt thành công!', 'success');
+  } catch(e) {
+    errEl.textContent = e.message || 'Đặt hàng thất bại. Thử lại sau.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Đặt hàng ngay →';
+  }
 }
 
 renderCart();

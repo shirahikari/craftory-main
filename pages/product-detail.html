@@ -169,7 +169,7 @@
 
 <div id="ftr"></div>
 <script src="../assets/js/env.js"></script>
-<script src="../assets/js/db.js"></script>
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/app.js"></script>
 <script>
 document.getElementById('hdr').innerHTML = renderHeader('shop','../');
@@ -193,7 +193,7 @@ if (!p) {
 
   const catMap = { kit:'Bộ kit thủ công', book:'Sách hướng dẫn', membership:'Gói thành viên' };
   const badgeMap = { hot:'🔥 Bán chạy', new:'✨ Hàng mới', sale:'🏷 Đang giảm' };
-  const vids = DB.videos.getByKit(pid);
+  const vids = []; // Video library coming soon
   const discount = p.old ? Math.round((1 - p.price/p.old)*100) : 0;
 
   // KIT folder structure: KIT01/KIT01-1.png ... KIT01-4.png

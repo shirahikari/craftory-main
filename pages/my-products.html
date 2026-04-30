@@ -82,7 +82,7 @@
 
 <div id="ftr"></div>
 <script src="../assets/js/env.js"></script>
-<script src="../assets/js/db.js"></script>
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/app.js"></script>
 <script>
 document.getElementById('hdr').innerHTML = renderHeader('myproducts','../');
@@ -103,7 +103,23 @@ function onAuthChange() {
   const u = Auth.user;
   const firstName = u.name.split(' ').pop();
   document.getElementById('welcomeMsg').textContent = `Xin chào, ${firstName}! 👋`;
-  renderKits(u);
+  loadPurchasedKits();
+}
+
+async function loadPurchasedKits() {
+  try {
+    const { orders } = await API.orders.list();
+    // Collect unique purchased product IDs from delivered/shipped orders
+    const purchasedIds = new Set();
+    orders.forEach(o => {
+      if (!['cancelled'].includes(o.status)) {
+        o.items.forEach(i => purchasedIds.add(i.productId));
+      }
+    });
+    renderKits({ purchases: [...purchasedIds] });
+  } catch(e) {
+    renderKits({ purchases: [] });
+  }
 }
 
 function renderKits(user) {
@@ -140,7 +156,7 @@ function renderKits(user) {
 }
 
 function buildKitCard(p, prog) {
-  const vids = DB.videos.getByKit(p.id);
+  const vids = []; // Video management coming soon
   const pct = prog.pct || 0;
   const done = pct >= 100;
   const curIdx = Math.floor(vids.length * (pct / 100));
@@ -264,9 +280,9 @@ async function callAI(file, pid) {
   const fb = document.getElementById('rFb_' + pid);
   const p = PRODUCTS.find(x => x.id === pid) || { name: 'kit' };
   try {
-    const reply = await callOpenAI(
-      `Hãy nhận xét tác phẩm thủ công của bé trong ảnh này (bộ kit "${p.name}"). Khen ngợi điểm sáng tạo và nỗ lực, đưa ra 1-2 gợi ý cải thiện nhẹ nhàng và tích cực, rồi khuyến khích bé tiếp tục sáng tạo.`,
-      'Bạn là giáo viên thủ công thân thiện của Craftory Vietnam. Trả lời bằng tiếng Việt, giọng văn ấm áp, khích lệ như đang nói chuyện với phụ huynh và bé, khoảng 4-6 câu. Bắt đầu bằng một lời khen thật cụ thể và chân thành.'
+    const { reply } = await API.chat.send(
+      [{ role: 'user', content: `Bé đã hoàn thành bộ kit thủ công "${p.name}" và vừa tải ảnh tác phẩm lên. Hãy khen ngợi điểm sáng tạo và nỗ lực của bé, đưa ra 1-2 gợi ý cải thiện nhẹ nhàng và tích cực, rồi khuyến khích bé tiếp tục sáng tạo.` }],
+      'Bạn là giáo viên thủ công thân thiện của Craftory Vietnam. Trả lời bằng tiếng Việt, giọng văn ấm áp, khích lệ như đang nói chuyện với phụ huynh và bé, khoảng 4-6 câu.'
     );
     fb.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:1.2rem;flex-shrink:0">🤖</span><div>${reply.replace(/\n/g, '<br>')}</div></div>`;
   } catch {
