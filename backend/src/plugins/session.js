@@ -21,7 +21,7 @@ export const sessionPlugin = fp(async (fastify) => {
       },
     });
 
-    if (session && session.user.status === 'active') {
+    if (session && session.user && session.user.status === 'active') {
       req.session = session;
       req.user = session.user;
     }
