@@ -178,6 +178,7 @@ document.getElementById('ftr').innerHTML = renderFooter('../');
 const pid = +new URLSearchParams(location.search).get('id');
 let p = null;
 let QTY = 1;
+// thumbData is populated in _renderPage() after async load; declared here so setThumb() can access it.
 let thumbData = [];
 
 (async function initPage() {
@@ -192,16 +193,24 @@ let thumbData = [];
     Cart.register(allProds.length ? allProds : [p]);
     _renderPage(p, allProds);
   } catch(e) {
-    _showNotFound();
+    console.error('Không thể tải sản phẩm:', e);
+    const isNotFound = e.status === 404;
+    _showNotFound(isNotFound);
   }
 })();
 
-function _showNotFound() {
-  document.getElementById('pdpWrap').innerHTML = `
+function _showNotFound(isProductMissing = true) {
+  document.getElementById('pdpWrap').innerHTML = isProductMissing ? `
   <div style="text-align:center;padding:100px 20px">
     <div style="font-size:4rem;margin-bottom:20px">😕</div>
     <h2 style="margin-bottom:10px">Không tìm thấy sản phẩm</h2>
     <p style="color:var(--ink-4);margin-bottom:28px">Sản phẩm này không tồn tại hoặc đã bị xoá.</p>
+    <a href="shop.html" class="btn btn-primary btn-lg">← Về cửa hàng</a>
+  </div>` : `
+  <div style="text-align:center;padding:100px 20px">
+    <div style="font-size:4rem;margin-bottom:20px">⚠️</div>
+    <h2 style="margin-bottom:10px">Không thể tải sản phẩm</h2>
+    <p style="color:var(--ink-4);margin-bottom:28px">Đã xảy ra lỗi kết nối. Vui lòng thử lại sau.</p>
     <a href="shop.html" class="btn btn-primary btn-lg">← Về cửa hàng</a>
   </div>`;
 }

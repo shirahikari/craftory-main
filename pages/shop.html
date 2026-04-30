@@ -707,6 +707,7 @@ document.getElementById('mobileDrawer')?.addEventListener('click', e => {
     ALL_PRODUCTS = products.map(normalizeProduct);
     Cart.register(ALL_PRODUCTS);
   } catch(e) {
+    console.error('Không thể tải danh sách sản phẩm:', e);
     ALL_PRODUCTS = [];
   }
   applyFilters();
