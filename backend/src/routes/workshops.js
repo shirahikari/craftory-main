@@ -27,7 +27,9 @@ export default async function workshopRoutes(fastify) {
   });
 
   // POST /api/v1/workshops/register
-  fastify.post('/workshops/register', async (req, reply) => {
+  fastify.post('/workshops/register', {
+    config: { rateLimit: { max: 5, timeWindow: '10 minutes' } },
+  }, async (req, reply) => {
     const parsed = regSchema.safeParse(req.body);
     if (!parsed.success) {
       return reply.code(400).send({ message: parsed.error.errors[0]?.message || 'Dữ liệu không hợp lệ.' });

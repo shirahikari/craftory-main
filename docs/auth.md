@@ -69,8 +69,4 @@ Configured globally on Fastify. Content-Security-Policy is managed by nginx.
 
 ## Demo Accounts
 
-Seeded for development:
-- Admin: `admin@craftory.vn` / `craftory@2026`
-- Employee: `employee@craftory.vn` / `employee@2026`
-
-**Change these in production!**
+Demo accounts are seeded only when `SEED_DEMO_USERS=true` is set. The admin email, employee email, and initial passwords are configured via environment variables (`ADMIN_EMAIL`, `ADMIN_INITIAL_PASSWORD`, `EMPLOYEE_EMAIL`, `EMPLOYEE_INITIAL_PASSWORD`). Do not commit credentials to the repository.

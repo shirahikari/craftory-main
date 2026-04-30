@@ -55,20 +55,37 @@ const WORKSHOPS = [
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // Seed users
-  const adminHash = await bcrypt.hash('craftory@2026', 12);
-  await prisma.user.upsert({
-    where: { email: 'admin@craftory.vn' },
-    update: {},
-    create: { email: 'admin@craftory.vn', passwordHash: adminHash, name: 'Craftory Admin', role: 'admin' },
-  });
+  // Seed admin/employee demo users only when explicitly enabled (never in production by default)
+  if (process.env.SEED_DEMO_USERS === 'true') {
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@craftory.vn';
+    const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
+    if (!adminPassword) {
+      console.error('❌ ADMIN_INITIAL_PASSWORD env var is required when SEED_DEMO_USERS=true');
+      process.exit(1);
+    }
+    const adminHash = await bcrypt.hash(adminPassword, 12);
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: {},
+      create: { email: adminEmail, passwordHash: adminHash, name: 'Craftory Admin', role: 'admin' },
+    });
 
-  const empHash = await bcrypt.hash('employee@2026', 12);
-  await prisma.user.upsert({
-    where: { email: 'employee@craftory.vn' },
-    update: {},
-    create: { email: 'employee@craftory.vn', passwordHash: empHash, name: 'Craftory Employee', role: 'employee' },
-  });
+    const empEmail = process.env.EMPLOYEE_EMAIL || 'employee@craftory.vn';
+    const empPassword = process.env.EMPLOYEE_INITIAL_PASSWORD;
+    if (!empPassword) {
+      console.error('❌ EMPLOYEE_INITIAL_PASSWORD env var is required when SEED_DEMO_USERS=true');
+      process.exit(1);
+    }
+    const empHash = await bcrypt.hash(empPassword, 12);
+    await prisma.user.upsert({
+      where: { email: empEmail },
+      update: {},
+      create: { email: empEmail, passwordHash: empHash, name: 'Craftory Employee', role: 'employee' },
+    });
+    console.log('✅ Demo users seeded');
+  } else {
+    console.log('ℹ️  Skipping demo user seeding (set SEED_DEMO_USERS=true to enable)');
+  }
 
   // Seed products
   for (const product of PRODUCTS) {
@@ -90,9 +107,6 @@ async function main() {
   console.log(`✅ Seeded ${WORKSHOPS.length} workshops`);
 
   console.log('✅ Seeding complete!');
-  console.log('\n📋 Demo accounts:');
-  console.log('   Admin:    admin@craftory.vn / craftory@2026');
-  console.log('   Employee: employee@craftory.vn / employee@2026');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

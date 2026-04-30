@@ -2,7 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /pages/admin/
 Disallow: /assets/js/env.js
-Disallow: /assets/js/db.js
 Disallow: /backend/
 
-Sitemap: https://craftory.vn/sitemap.xml
+Sitemap: https://craftory.io.vn/sitemap.xml

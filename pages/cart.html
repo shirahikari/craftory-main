@@ -124,12 +124,12 @@ function renderCart() {
           return `
           <div class="cart-item">
             <div class="cart-item-em" style="background:${bgMap[p.cat]||'var(--cream)'}">
-              <img src="../assets/images/products/kit-${p.id}.svg" alt="${p.name||''}" style="width:72%;height:72%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-              <span style="display:none;font-size:2.4rem">${p.em||'📦'}</span>
+              <img src="../assets/images/products/kit-${p.id}.svg" alt="${esc(p.name||'')}" style="width:72%;height:72%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+              <span style="display:none;font-size:2.4rem">${esc(p.em||'📦')}</span>
             </div>
             <div class="cart-item-info">
-              <div class="cart-item-name">${p.name||'Sản phẩm'}</div>
-              <div class="cart-item-meta">${p.col||''} · ${p.age||''}</div>
+              <div class="cart-item-name">${esc(p.name||'Sản phẩm')}</div>
+              <div class="cart-item-meta">${esc(p.col||'')} · ${esc(p.age||'')}</div>
               <div class="cart-qty-ctrl">
                 <button class="cq-btn" onclick="Cart.setQty(${item.id},${item.qty-1});renderCart()">−</button>
                 <span class="cq-val">${item.qty}</span>

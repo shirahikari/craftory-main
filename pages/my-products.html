@@ -164,12 +164,12 @@ function buildKitCard(p, prog) {
   <div class="kit-card" style="background:var(--surface);border:1.5px solid var(--parchment-2);border-radius:var(--r-xl);margin-bottom:16px;box-shadow:var(--sh-sm);overflow:hidden">
     <div class="kit-header" onclick="toggleKit(${p.id})">
       <div class="kit-em" style="background:${p.bg}">
-        <img src="../assets/images/products/kit-${p.id}.svg" alt="${p.name}" style="width:90%;height:90%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-        <span style="display:none;font-size:2rem">${p.em}</span>
+        <img src="../assets/images/products/kit-${p.id}.svg" alt="${esc(p.name)}" style="width:90%;height:90%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none;font-size:2rem">${esc(p.em)}</span>
       </div>
       <div class="kit-info">
-        <div class="kit-name">${p.name}</div>
-        <div class="kit-sub">${p.col} · ${p.age}</div>
+        <div class="kit-name">${esc(p.name)}</div>
+        <div class="kit-sub">${esc(p.col)} · ${esc(p.age)}</div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
           <div class="prog-track" style="flex:1;max-width:200px">
             <div class="prog-fill${done ? ' done' : ''}" style="width:${pct}%"></div>

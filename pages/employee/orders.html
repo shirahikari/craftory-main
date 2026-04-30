@@ -126,12 +126,12 @@ async function loadOrders() {
       <tr>
         <td><span style="font-family:var(--font-h);font-size:.78rem;font-weight:700;color:var(--ink-3)">#${o.id.slice(-8).toUpperCase()}</span></td>
         <td>
-          <div style="font-weight:600;font-size:.85rem">${o.shippingName}</div>
-          <div style="font-size:.75rem;color:var(--ink-4)">${o.shippingPhone}</div>
-          <div style="font-size:.72rem;color:var(--ink-5)">${o.user?.email||''}</div>
+          <div style="font-weight:600;font-size:.85rem">${esc(o.shippingName)}</div>
+          <div style="font-size:.75rem;color:var(--ink-4)">${esc(o.shippingPhone)}</div>
+          <div style="font-size:.72rem;color:var(--ink-5)">${esc(o.user?.email||'')}</div>
         </td>
         <td style="max-width:200px">
-          <div style="font-size:.78rem;color:var(--ink-3)">${o.items.map(i=>`${i.product?.name||'SP'} ×${i.qty}`).join(', ')}</div>
+          <div style="font-size:.78rem;color:var(--ink-3)">${o.items.map(i=>`${esc(i.product?.name||'SP')} ×${i.qty}`).join(', ')}</div>
         </td>
         <td style="font-family:var(--font-h);font-weight:700;color:var(--orange)">${o.total.toLocaleString('vi-VN')}đ</td>
         <td style="font-size:.78rem;color:var(--ink-4)">${new Date(o.createdAt).toLocaleDateString('vi-VN')}</td>

@@ -27,7 +27,7 @@ export default async function productRoutes(fastify) {
     if (isNaN(id)) return reply.code(400).send({ message: 'ID không hợp lệ.' });
 
     const product = await fastify.prisma.product.findFirst({
-      where: { id, status: { in: ['published', 'draft'] } },
+      where: { id, status: 'published' },
     });
 
     if (!product) return reply.code(404).send({ message: 'Không tìm thấy sản phẩm.' });
