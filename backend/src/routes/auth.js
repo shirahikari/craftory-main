@@ -9,9 +9,10 @@ const loginSchema = z.object({
 });
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự.').max(100),
+  name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự.').max(100)
+    .refine(s => !/[<>]/.test(s), { message: 'Tên không được chứa ký tự < hoặc >.' }),
   email: z.string().email('Email không hợp lệ.'),
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự.'),
+  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự.').max(200),
 });
 
 export default async function authRoutes(fastify) {

@@ -189,7 +189,7 @@ async function loadProducts() {
         <td>
           <div style="display:flex;gap:6px">
             <button class="act-btn act-edit" onclick="openEditModal(${p.id})">Sửa</button>
-            <button class="act-btn act-del" onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"\\'")}')">Xóa</button>
+            <button class="act-btn act-del" data-pid="${p.id}" onclick="deleteProduct(${p.id})">Xóa</button>
           </div>
         </td>
       </tr>`).join('');
@@ -271,7 +271,9 @@ async function saveProd(e) {
   }
 }
 
-async function deleteProduct(id, name) {
+async function deleteProduct(id) {
+  const p = _products.find(x => x.id === id);
+  const name = p?.name || `#${id}`;
   if (!confirm(`Xóa sản phẩm "${name}"?\n(Nếu có đơn hàng, sản phẩm sẽ được lưu trữ thay vì xóa)`)) return;
   try {
     const result = await API.admin.products.remove(id);

@@ -7,6 +7,21 @@ const API_BASE = (window.ENV && window.ENV.API_BASE) ? window.ENV.API_BASE : '/a
 
 let _csrfToken = null;
 
+function _showApiDownBanner() {
+  if (document.getElementById('api-down-banner')) return;
+  const div = document.createElement('div');
+  div.id = 'api-down-banner';
+  div.setAttribute('role', 'alert');
+  div.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#FEF3C7;color:#92400E;border-bottom:1.5px solid #FDE68A;padding:10px 16px;font-family:system-ui,sans-serif;font-size:.9rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)';
+  div.textContent = '⚠️ Hệ thống đang bảo trì — một số tính năng tạm thời không khả dụng. Vui lòng thử lại sau ít phút.';
+  document.body && document.body.appendChild(div);
+}
+
+function _hideApiDownBanner() {
+  const el = document.getElementById('api-down-banner');
+  if (el) el.remove();
+}
+
 async function _fetch(path, options = {}) {
   const method = (options.method || 'GET').toUpperCase();
   const headers = { 'Content-Type': 'application/json' };
@@ -16,11 +31,28 @@ async function _fetch(path, options = {}) {
     headers['X-CSRF-Token'] = _csrfToken;
   }
 
-  const res = await fetch(API_BASE + path, {
-    credentials: 'include',
-    headers: { ...headers, ...(options.headers || {}) },
-    ...options,
-  });
+  let res;
+  try {
+    res = await fetch(API_BASE + path, {
+      credentials: 'include',
+      headers: { ...headers, ...(options.headers || {}) },
+      ...options,
+    });
+  } catch (networkErr) {
+    // Network failure — show maintenance banner once.
+    _showApiDownBanner();
+    const err = new Error('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+    err.status = 0;
+    err.networkError = true;
+    throw err;
+  }
+
+  // 5xx upstream failure (e.g. 502/503/504 when backend container is down)
+  if (res.status >= 502 && res.status <= 504) {
+    _showApiDownBanner();
+  } else if (res.ok) {
+    _hideApiDownBanner();
+  }
 
   // Parse response
   let data;

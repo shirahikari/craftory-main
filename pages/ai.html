@@ -121,13 +121,27 @@ function addMsg(role,text,imgData){
   const av=role==='user'?(Auth.user?.avatar||'👤'):'🤖';
   const div=document.createElement('div');
   div.className=`msg ${role}`;
-  div.innerHTML=`
-    <div class="msg-av">${av}</div>
-    <div>
-      ${imgData?`<img src="${imgData}" style="max-width:160px;border-radius:var(--r-sm);margin-bottom:6px;display:block">`:'' }
-      <div class="msg-bubble">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>
-      <span class="msg-time">${time}</span>
-    </div>`;
+  // Escape user/AI text first, THEN re-introduce only the markdown markup we control.
+  const safeText = esc(text)
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+  // imgData is a blob: URL we created locally — still set via attribute write to keep CSP-friendly.
+  const avSpan = document.createElement('div'); avSpan.className = 'msg-av'; avSpan.textContent = av;
+  const bodyDiv = document.createElement('div');
+  if (imgData) {
+    const img = document.createElement('img');
+    img.src = imgData;
+    img.style.cssText = 'max-width:160px;border-radius:var(--r-sm);margin-bottom:6px;display:block';
+    bodyDiv.appendChild(img);
+  }
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = safeText;
+  bodyDiv.appendChild(bubble);
+  const ts = document.createElement('span'); ts.className = 'msg-time'; ts.textContent = time;
+  bodyDiv.appendChild(ts);
+  div.appendChild(avSpan);
+  div.appendChild(bodyDiv);
   c.appendChild(div);
   c.scrollTop=c.scrollHeight;
 }

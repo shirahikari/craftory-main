@@ -1,9 +1,11 @@
 import { z } from 'zod';
 
 const regSchema = z.object({
-  workshopId: z.string().min(1),
-  guestName: z.string().min(2).optional(),
-  guestPhone: z.string().min(8).optional(),
+  workshopId: z.string().min(1).max(64),
+  guestName: z.string().min(2).max(100)
+    .refine(s => !/[<>]/.test(s), { message: 'Tên không được chứa ký tự < hoặc >.' })
+    .optional(),
+  guestPhone: z.string().regex(/^[0-9]{8,11}$/, 'Số điện thoại không hợp lệ.').optional(),
 });
 
 export default async function workshopRoutes(fastify) {
@@ -48,8 +50,20 @@ export default async function workshopRoutes(fastify) {
     if (req.user) {
       data.userId = req.user.id;
     } else {
+      if (!guestName || !guestPhone) {
+        return reply.code(400).send({ message: 'Vui lòng nhập tên và số điện thoại.' });
+      }
       data.guestName = guestName;
       data.guestPhone = guestPhone;
+    }
+
+    // Dedup: same user or same guest phone cannot register twice for the same workshop
+    const dupWhere = { workshopId };
+    if (data.userId) dupWhere.userId = data.userId;
+    else dupWhere.guestPhone = data.guestPhone;
+    const existingReg = await fastify.prisma.workshopRegistration.findFirst({ where: dupWhere });
+    if (existingReg) {
+      return reply.code(409).send({ message: 'Bạn đã đăng ký workshop này rồi.' });
     }
 
     const registration = await fastify.prisma.workshopRegistration.create({ data });

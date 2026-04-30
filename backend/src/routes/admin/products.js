@@ -2,19 +2,25 @@ import { z } from 'zod';
 import { AppError } from '../../utils/errors.js';
 import { requireEmployee, requireCsrf } from '../../middleware/rbac.js';
 
+// Reject any string containing HTML angle brackets — defense-in-depth against stored XSS.
+const noHtml = (label) => z.string().refine(
+  s => !/[<>]/.test(s),
+  { message: `${label} không được chứa ký tự < hoặc >.` }
+);
+
 const productSchema = z.object({
-  name: z.string().min(2).max(200),
-  description: z.string().min(10),
+  name: noHtml('Tên sản phẩm').and(z.string().min(2).max(200)),
+  description: noHtml('Mô tả').and(z.string().min(10).max(5000)),
   price: z.number().int().positive(),
   oldPrice: z.number().int().positive().nullable().optional(),
   category: z.enum(['kit', 'book']),
-  ageRange: z.string().min(2).max(50),
-  collection: z.string().min(2).max(100),
-  emoji: z.string().optional().default('🎨'),
+  ageRange: noHtml('Độ tuổi').and(z.string().min(2).max(50)),
+  collection: noHtml('Bộ sưu tập').and(z.string().min(2).max(100)),
+  emoji: z.string().max(8).optional().default('🎨'),
   badge: z.enum(['hot', 'new', 'sale']).nullable().optional(),
   bgColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional().default('#FEF5EA'),
-  includes: z.array(z.string()).optional().default([]),
-  images: z.array(z.string().url()).optional().default([]),
+  includes: z.array(noHtml('Mục bao gồm').and(z.string().min(1).max(300))).max(40).optional().default([]),
+  images: z.array(z.string().url()).max(20).optional().default([]),
   status: z.enum(['published', 'draft', 'archived']).optional().default('published'),
 });
 

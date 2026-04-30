@@ -284,7 +284,8 @@ async function callAI(file, pid) {
       [{ role: 'user', content: `Bé đã hoàn thành bộ kit thủ công "${p.name}" và vừa tải ảnh tác phẩm lên. Hãy khen ngợi điểm sáng tạo và nỗ lực của bé, đưa ra 1-2 gợi ý cải thiện nhẹ nhàng và tích cực, rồi khuyến khích bé tiếp tục sáng tạo.` }],
       'Bạn là giáo viên thủ công thân thiện của Craftory Vietnam. Trả lời bằng tiếng Việt, giọng văn ấm áp, khích lệ như đang nói chuyện với phụ huynh và bé, khoảng 4-6 câu.'
     );
-    fb.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:1.2rem;flex-shrink:0">🤖</span><div>${reply.replace(/\n/g, '<br>')}</div></div>`;
+    // Escape AI reply before re-introducing only the safe newline → <br> conversion.
+    fb.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:1.2rem;flex-shrink:0">🤖</span><div>${esc(reply).replace(/\n/g, '<br>')}</div></div>`;
   } catch {
     fb.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:1.2rem;flex-shrink:0">🎨</span><div>Tuyệt vời! Bé đã làm rất sáng tạo và tỉ mỉ! Màu sắc được lựa chọn rất hài hoà và các chi tiết được ghép lại gọn gàng. Lần sau hãy thử thêm vài chi tiết nhỏ để tác phẩm thêm sinh động nhé! Ba mẹ hãy lưu lại bức ảnh này — đây là kỷ niệm đẹp của bé!</div></div>`;
   }

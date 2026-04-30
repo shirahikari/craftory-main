@@ -7,17 +7,25 @@ const orderItemSchema = z.object({
   qty: z.number().int().min(1).max(99),
 });
 
+const noHtml = (label) => z.string().refine(
+  s => !/[<>]/.test(s),
+  { message: `${label} không được chứa ký tự < hoặc >.` }
+);
+
 const createOrderSchema = z.object({
   items: z.array(orderItemSchema).min(1, 'Giỏ hàng trống.').max(50, 'Giỏ hàng không được vượt quá 50 sản phẩm.'),
-  shippingName: z.string().min(2, 'Tên người nhận không hợp lệ.').max(100),
+  shippingName: noHtml('Tên người nhận').and(z.string().min(2, 'Tên người nhận không hợp lệ.').max(100)),
   shippingPhone: z.string().regex(/^[0-9]{9,11}$/, 'Số điện thoại không hợp lệ.'),
-  shippingAddress: z.string().min(10, 'Địa chỉ không hợp lệ.').max(500),
-  note: z.string().max(500).optional(),
+  shippingAddress: noHtml('Địa chỉ').and(z.string().min(10, 'Địa chỉ không hợp lệ.').max(500)),
+  note: noHtml('Ghi chú').and(z.string().max(500)).optional(),
 });
 
 export default async function orderRoutes(fastify) {
   // POST /api/v1/orders
-  fastify.post('/orders', { preHandler: [requireAuth, requireCsrf] }, async (req, reply) => {
+  fastify.post('/orders', {
+    preHandler: [requireAuth, requireCsrf],
+    bodyLimit: 65536, // 64 KB — well above legitimate 50-item payload, blocks bulk-row attacks
+  }, async (req, reply) => {
     const parsed = createOrderSchema.safeParse(req.body);
     if (!parsed.success) {
       throw new AppError(parsed.error.errors[0]?.message || 'Dữ liệu không hợp lệ.', 400);

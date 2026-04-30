@@ -53,20 +53,39 @@ const Cart = (() => {
     const c = _items.reduce((s,i)=>s+(i.qty||1),0);
     document.querySelectorAll('.cart-count').forEach(el=>{el.textContent=c;el.classList.toggle('show',c>0);});
   }
+  // Normalize an API product (snake-ish) to the keys cart UI expects.
+  function _normalize(p) {
+    return {
+      id: p.id,
+      name: p.name,
+      em: p.em || p.emoji || '📦',
+      col: p.col || p.collection || '',
+      cat: p.cat || p.category || '',
+      age: p.age || p.ageRange || '',
+      price: Number(p.price) || 0,
+      old: p.old ?? p.oldPrice ?? null,
+      bg: p.bg || p.bgColor || 'var(--cream)',
+    };
+  }
   _load();
   return {
     get items() { return _items; },
     reload: _load, updateBadge: _badge,
-    add(pid, qty=1) {
+    add(pid, qty=1, product) {
       _load();
-      const p = PRODUCTS.find(x=>x.id===pid); if(!p) return;
+      // Caller may pass the product explicitly (preferred when sourced from API).
+      // Fallback: look up the seeded PRODUCTS catalog.
+      const src = product || (typeof PRODUCTS !== 'undefined' ? PRODUCTS.find(x=>x.id===pid) : null);
+      if (!src) { Toast.show('Không tìm thấy sản phẩm', 'error'); return; }
+      const p = _normalize(src);
       const ex = _items.find(x=>x.id===pid);
-      if(ex) ex.qty=(ex.qty||1)+qty; else _items.push({...p,qty});
+      if (ex) ex.qty = (ex.qty||1) + qty;
+      else _items.push({ ...p, qty });
       _save(); Toast.show(`Đã thêm "${p.name}" vào giỏ`, 'success');
     },
     remove(pid) { _load(); _items=_items.filter(x=>x.id!==pid); _save(); },
     setQty(pid,qty) { _load(); const i=_items.find(x=>x.id===pid); if(i) i.qty=Math.max(1,qty); _save(); },
-    total() { return _items.reduce((s,i)=>s+(i.price||0)*(i.qty||1),0); },
+    total() { return _items.reduce((s,i)=>s+(Number(i.price)||0)*(i.qty||1),0); },
     count() { return _items.reduce((s,i)=>s+(i.qty||1),0); },
     clear() { _items=[]; _save(); },
   };
@@ -301,10 +320,10 @@ function renderFooter(base='') {
           </div>
           <p class="footer-desc">Học thủ công bằng tay cho trẻ em.<br>Ít màn hình — nhiều sáng tạo hơn.</p>
           <div class="footer-socials">
-            <a class="footer-social" title="Facebook" href="https://facebook.com/craftory.vn" target="_blank" rel="noopener">📘</a>
-            <a class="footer-social" title="Instagram" href="https://instagram.com/craftory.vn" target="_blank" rel="noopener">📸</a>
+            <a class="footer-social" title="Facebook" href="https://facebook.com/craftory.io.vn" target="_blank" rel="noopener">📘</a>
+            <a class="footer-social" title="Instagram" href="https://instagram.com/craftory.io.vn" target="_blank" rel="noopener">📸</a>
             <a class="footer-social" title="YouTube" href="https://youtube.com/@craftoryvietnam" target="_blank" rel="noopener">▶</a>
-            <a class="footer-social" title="TikTok" href="https://tiktok.com/@craftory.vn" target="_blank" rel="noopener">🎵</a>
+            <a class="footer-social" title="TikTok" href="https://tiktok.com/@craftory.io.vn" target="_blank" rel="noopener">🎵</a>
           </div>
         </div>
         <div class="footer-col">

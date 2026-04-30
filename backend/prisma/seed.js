@@ -57,7 +57,7 @@ async function main() {
 
   // Seed admin/employee demo users only when explicitly enabled (never in production by default)
   if (process.env.SEED_DEMO_USERS === 'true') {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@craftory.vn';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@craftory.io.vn';
     const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
     if (!adminPassword) {
       console.error('❌ ADMIN_INITIAL_PASSWORD env var is required when SEED_DEMO_USERS=true');
@@ -70,7 +70,7 @@ async function main() {
       create: { email: adminEmail, passwordHash: adminHash, name: 'Craftory Admin', role: 'admin' },
     });
 
-    const empEmail = process.env.EMPLOYEE_EMAIL || 'employee@craftory.vn';
+    const empEmail = process.env.EMPLOYEE_EMAIL || 'employee@craftory.io.vn';
     const empPassword = process.env.EMPLOYEE_INITIAL_PASSWORD;
     if (!empPassword) {
       console.error('❌ EMPLOYEE_INITIAL_PASSWORD env var is required when SEED_DEMO_USERS=true');

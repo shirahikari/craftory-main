@@ -120,16 +120,18 @@ function renderCart() {
 
       <div id="itemsList">
         ${items.map(item => {
-          const p = PRODUCTS.find(x => x.id === item.id) || {};
+          // Use the snapshot stored on the cart item at add-time. This stays correct even
+          // when the seed catalog changes, and when items added via the API don't appear in PRODUCTS.
+          const price = Number(item.price) || 0;
           return `
           <div class="cart-item">
-            <div class="cart-item-em" style="background:${bgMap[p.cat]||'var(--cream)'}">
-              <img src="../assets/images/products/kit-${p.id}.svg" alt="${esc(p.name||'')}" style="width:72%;height:72%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-              <span style="display:none;font-size:2.4rem">${esc(p.em||'📦')}</span>
+            <div class="cart-item-em" style="background:${bgMap[item.cat]||'var(--cream)'}">
+              <img src="../assets/images/products/kit-${item.id}.svg" alt="${esc(item.name||'')}" style="width:72%;height:72%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+              <span style="display:none;font-size:2.4rem">${esc(item.em||'📦')}</span>
             </div>
             <div class="cart-item-info">
-              <div class="cart-item-name">${esc(p.name||'Sản phẩm')}</div>
-              <div class="cart-item-meta">${esc(p.col||'')} · ${esc(p.age||'')}</div>
+              <div class="cart-item-name">${esc(item.name||'Sản phẩm')}</div>
+              <div class="cart-item-meta">${esc(item.col||'')} · ${esc(item.age||'')}</div>
               <div class="cart-qty-ctrl">
                 <button class="cq-btn" onclick="Cart.setQty(${item.id},${item.qty-1});renderCart()">−</button>
                 <span class="cq-val">${item.qty}</span>
@@ -137,7 +139,7 @@ function renderCart() {
               </div>
             </div>
             <div class="cart-item-price-col">
-              <div class="cart-item-price">${(p.price*item.qty).toLocaleString('vi-VN')}đ</div>
+              <div class="cart-item-price">${(price*item.qty).toLocaleString('vi-VN')}đ</div>
               <button class="cart-rm" onclick="Cart.remove(${item.id});renderCart()" title="Xoá khỏi giỏ">✕</button>
             </div>
           </div>`;
@@ -154,11 +156,6 @@ function renderCart() {
         <h3 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:18px;color:var(--ink)">Tóm tắt đơn hàng</h3>
         <div class="sum-row"><span>Tạm tính (${Cart.count()} sản phẩm)</span><strong>${total.toLocaleString('vi-VN')}đ</strong></div>
         <div class="sum-row"><span>Vận chuyển</span><strong style="color:${ship?'var(--ink-2)':'var(--green)'}">${ship ? ship.toLocaleString('vi-VN')+'đ' : 'Miễn phí 🎉'}</strong></div>
-        <div class="promo-row">
-          <input type="text" id="promoInput" placeholder="Mã khuyến mãi..." onkeydown="if(event.key==='Enter')applyPromo()">
-          <button onclick="applyPromo()">Áp dụng</button>
-        </div>
-        <div id="promoMsg" style="font-size:.8rem;min-height:20px;margin-bottom:4px"></div>
         <div class="sum-divider"></div>
         <div class="sum-total">
           <span class="sum-total-lbl">Tổng cộng</span>
@@ -176,17 +173,6 @@ function renderCart() {
       </div>
     </div>
   </div>`;
-}
-
-function applyPromo() {
-  const code = document.getElementById('promoInput').value.trim().toUpperCase();
-  const msg = document.getElementById('promoMsg');
-  const codes = { CRAFTORY10:'Giảm 10% đơn hàng', FREESHIP:'Miễn phí vận chuyển', NEWBIE:'Giảm 15% cho lần đầu tiên' };
-  if (codes[code]) {
-    msg.innerHTML = `<span style="color:var(--green);font-weight:600;font-family:var(--font-h);display:flex;align-items:center;gap:5px">✓ Áp dụng thành công: ${codes[code]}</span>`;
-  } else {
-    msg.innerHTML = `<span style="color:var(--rose);font-weight:600;font-family:var(--font-h);display:flex;align-items:center;gap:5px">✕ Mã không hợp lệ hoặc đã hết hạn</span>`;
-  }
 }
 
 function checkout() {
