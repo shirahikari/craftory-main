@@ -39,7 +39,7 @@ export default async function adminStatsRoutes(fastify) {
 
       fastify.prisma.$queryRaw`
         SELECT
-          "productId",
+          "productId"::int AS "productId",
           SUM(qty)::int AS "totalQty",
           SUM(qty * "unitPrice")::int AS "totalRevenue"
         FROM "OrderItem"
@@ -61,7 +61,7 @@ export default async function adminStatsRoutes(fastify) {
     ]);
 
     // Enrich top products with names
-    const productIds = topProducts.map(t => Number(t.productId));
+    const productIds = topProducts.map(t => t.productId);
     const products = await fastify.prisma.product.findMany({
       where: { id: { in: productIds } },
       select: { id: true, name: true, emoji: true },
@@ -69,7 +69,7 @@ export default async function adminStatsRoutes(fastify) {
     const productMap = new Map(products.map(p => [p.id, p]));
 
     const topProductsEnriched = topProducts.map(t => ({
-      product: productMap.get(Number(t.productId)),
+      product: productMap.get(t.productId),
       totalQty: t.totalQty,
       totalRevenue: t.totalRevenue,
     }));
