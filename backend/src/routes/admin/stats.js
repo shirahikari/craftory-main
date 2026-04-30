@@ -37,12 +37,16 @@ export default async function adminStatsRoutes(fastify) {
         _count: { status: true },
       }),
 
-      fastify.prisma.orderItem.groupBy({
-        by: ['productId'],
-        _sum: { qty: true, unitPrice: true },
-        orderBy: { _sum: { qty: 'desc' } },
-        take: 5,
-      }),
+      fastify.prisma.$queryRaw`
+        SELECT
+          "productId",
+          SUM(qty)::int AS "totalQty",
+          SUM(qty * "unitPrice")::int AS "totalRevenue"
+        FROM "OrderItem"
+        GROUP BY "productId"
+        ORDER BY "totalQty" DESC
+        LIMIT 5
+      `,
 
       fastify.prisma.user.count({ where: { createdAt: { gte: day7 } } }),
 
@@ -57,7 +61,7 @@ export default async function adminStatsRoutes(fastify) {
     ]);
 
     // Enrich top products with names
-    const productIds = topProducts.map(t => t.productId);
+    const productIds = topProducts.map(t => Number(t.productId));
     const products = await fastify.prisma.product.findMany({
       where: { id: { in: productIds } },
       select: { id: true, name: true, emoji: true },
@@ -65,20 +69,20 @@ export default async function adminStatsRoutes(fastify) {
     const productMap = new Map(products.map(p => [p.id, p]));
 
     const topProductsEnriched = topProducts.map(t => ({
-      product: productMap.get(t.productId),
-      totalQty: t._sum.qty,
-      totalRevenue: (t._sum.qty || 0) * (t._sum.unitPrice || 0),
+      product: productMap.get(Number(t.productId)),
+      totalQty: t.totalQty,
+      totalRevenue: t.totalRevenue,
     }));
 
     // Revenue by day (last 7 days)
     const revenueByDay = await fastify.prisma.$queryRaw`
       SELECT
-        DATE("createdAt") as date,
-        COALESCE(SUM(total), 0)::int as revenue,
-        COUNT(*)::int as orders
+        "createdAt"::date AS date,
+        COALESCE(SUM(total), 0)::int AS revenue,
+        COUNT(*)::int AS orders
       FROM "Order"
       WHERE "createdAt" >= ${day7} AND status != 'cancelled'
-      GROUP BY DATE("createdAt")
+      GROUP BY "createdAt"::date
       ORDER BY date ASC
     `;
 

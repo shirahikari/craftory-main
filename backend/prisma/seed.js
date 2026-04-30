@@ -97,6 +97,9 @@ async function main() {
   }
   console.log(`✅ Seeded ${PRODUCTS.length} products`);
 
+  // Reset the auto-increment sequence so new products get IDs after the seeded ones
+  await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Product"', 'id'), COALESCE((SELECT MAX(id) FROM "Product"), 0))`;
+
   // Seed workshops
   for (const ws of WORKSHOPS) {
     const existing = await prisma.workshop.findFirst({ where: { title: ws.title } });
