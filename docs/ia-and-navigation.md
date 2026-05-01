@@ -7,6 +7,7 @@
 ├── /pages/shop.html           — Product catalog
 │   └── /pages/product-detail.html?id=N  — Product page
 ├── /pages/cart.html           — Shopping cart + checkout
+├── /pages/payment.html        — [Auth: customer+] SePay QR + payment status (?orderId=…)
 ├── /pages/workshop.html       — Workshop listing + registration
 ├── /pages/ai.html             — AI assistant chatbot
 ├── /pages/about.html          — Company story & team

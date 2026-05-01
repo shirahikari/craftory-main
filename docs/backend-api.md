@@ -103,14 +103,45 @@ Requires auth + CSRF.
 }
 
 // Response 201
-{ "order": { "id": "...", "total": 118000, "status": "pending", "items": [...] } }
+{
+  "order":   { "id": "...", "total": 118000, "status": "pending", "items": [...] },
+  "payment": { "qrUrl": "...", "bankCode": "...", "accountNumber": "...",
+               "accountName": "...", "memo": "CRAFTORY-XXXXXXXX", "amount": 118000 }
+}
 ```
 
 ### `GET /api/v1/orders`
 Returns current user's orders.
 
 ### `GET /api/v1/orders/:id`
-Returns specific order (owner only).
+Returns specific order (owner only). Response shape: `{ order, payment }`.
+`payment` is only returned while `order.status === 'pending'` and SePay is configured;
+otherwise it is `null`.
+
+---
+
+## Payment Page
+
+Customer-facing payment URL: `/pages/payment.html?orderId=<ORDER_ID>`
+
+- **Trang thanh toán yêu cầu đăng nhập.** Logged-out visitors are blocked from
+  loading order/payment data and shown a login CTA.
+- The page polls `GET /api/v1/orders/:id` every 4s (max 10 minutes) and updates
+  the UI when the SePay webhook flips the order out of `pending`.
+- Cart checkout redirects to this page after a successful `POST /api/v1/orders`.
+
+### SePay env vars (backend)
+
+| Variable                | Required | Purpose                                  |
+|-------------------------|----------|------------------------------------------|
+| `SEPAY_API_KEY`         | prod     | Webhook bearer token (validated on `POST /api/v1/webhooks/sepay`) |
+| `SEPAY_ACCOUNT_NUMBER`  | prod     | Receiving bank account number            |
+| `SEPAY_BANK_CODE`       | prod     | Bank code (e.g. `MB`, `VCB`)             |
+| `SEPAY_ACCOUNT_NAME`    | optional | Display-only account holder name         |
+
+When `SEPAY_ACCOUNT_NUMBER` or `SEPAY_BANK_CODE` is missing the order endpoints
+return `payment: null` and the payment page shows a "SePay chưa được cấu hình"
+state — the order itself is still created.
 
 ---
 
