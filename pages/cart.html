@@ -59,22 +59,66 @@
 </div>
 
 <div class="container">
-  <!-- Order success state -->
+  <!-- Payment pending state — shown right after order is placed -->
+  <div class="order-success" id="orderPending" style="display:none">
+    <div style="font-size:3rem;margin-bottom:12px">💳</div>
+    <h2 style="margin-bottom:6px">Quét mã để thanh toán</h2>
+    <p style="color:var(--ink-4);font-size:.88rem;margin-bottom:24px">Đơn hàng <strong id="pendingOrderId"></strong> đang chờ thanh toán</p>
+
+    <div style="background:var(--surface);border:1.5px solid var(--parchment-2);border-radius:var(--r-2xl);padding:28px;max-width:440px;margin:0 auto;box-shadow:var(--sh-md)">
+      <img id="payQr" src="" alt="QR thanh toán" style="width:240px;height:240px;display:block;margin:0 auto 16px;border-radius:var(--r-lg);background:#fff">
+      <div style="text-align:left;font-size:.88rem;line-height:1.85">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--parchment)">
+          <span style="color:var(--ink-4)">Ngân hàng</span>
+          <strong id="payBank"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--parchment)">
+          <span style="color:var(--ink-4)">Số tài khoản</span>
+          <span style="display:flex;align-items:center;gap:8px"><strong id="payAcc" style="font-family:var(--font-h)"></strong>
+            <button class="btn btn-ghost btn-sm" type="button" onclick="copyText('payAcc')" style="padding:2px 8px;font-size:.72rem">📋</button>
+          </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--parchment)">
+          <span style="color:var(--ink-4)">Tên chủ TK</span>
+          <strong id="payName"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--parchment)">
+          <span style="color:var(--ink-4)">Nội dung CK</span>
+          <span style="display:flex;align-items:center;gap:8px"><strong id="payMemo" style="font-family:var(--font-h)"></strong>
+            <button class="btn btn-ghost btn-sm" type="button" onclick="copyText('payMemo')" style="padding:2px 8px;font-size:.72rem">📋</button>
+          </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0">
+          <span style="color:var(--ink-4)">Số tiền</span>
+          <strong id="payAmount" style="color:var(--orange);font-size:1.1rem"></strong>
+        </div>
+      </div>
+      <div id="payStatus" style="margin-top:18px;padding:10px 14px;background:#FEF3C7;color:#92400E;border-radius:var(--r-md);font-size:.84rem;display:flex;align-items:center;gap:10px;justify-content:center">
+        <span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid #92400E;border-top-color:transparent;border-radius:50%;animation:spin .9s linear infinite"></span>
+        <span>Đang chờ thanh toán... Tự động cập nhật khi nhận được tiền.</span>
+      </div>
+    </div>
+
+    <p style="color:var(--ink-4);font-size:.78rem;margin-top:20px;max-width:440px;margin-left:auto;margin-right:auto">
+      Mở app ngân hàng → quét QR → xác nhận. Số tiền và nội dung đã được điền sẵn — đừng sửa nội dung chuyển khoản.
+    </p>
+    <p style="margin-top:8px"><a href="account.html" style="font-size:.82rem;color:var(--ink-4)">Xem trong "Đơn hàng của tôi" →</a></p>
+  </div>
+
+  <!-- Order success state — shown after payment is confirmed -->
   <div class="order-success" id="orderSuccess">
     <div style="font-size:5rem;margin-bottom:20px">🎉</div>
-    <h2 style="margin-bottom:10px;color:var(--green)">Đặt hàng thành công!</h2>
+    <h2 style="margin-bottom:10px;color:var(--green)">Thanh toán thành công!</h2>
     <p style="color:var(--ink-3);max-width:460px;margin:0 auto 8px;font-size:.96rem;line-height:1.7">
-      Cảm ơn bạn đã tin tưởng Craftory! Đơn hàng <strong id="successOrderId"></strong> đã được ghi nhận.
+      Cảm ơn bạn đã tin tưởng Craftory! Đơn hàng <strong id="successOrderId"></strong> đã được ghi nhận và đang được xử lý.
     </p>
-    <p style="color:var(--ink-4);font-size:.86rem;margin-bottom:28px">Chúng tôi sẽ xử lý và giao hàng trong 2–3 ngày làm việc.</p>
+    <p style="color:var(--ink-4);font-size:.86rem;margin-bottom:28px">Chúng tôi sẽ giao hàng trong 2–3 ngày làm việc.</p>
     <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
       <a href="my-products.html" class="btn btn-primary btn-lg">🎬 Xem video hướng dẫn →</a>
       <a href="shop.html" class="btn btn-outline btn-lg">Tiếp tục mua sắm</a>
     </div>
-    <div style="margin-top:36px;padding:22px;background:var(--parchment);border-radius:var(--r-xl);max-width:440px;margin-left:auto;margin-right:auto">
-      <p style="font-size:.84rem;color:var(--ink-3);line-height:1.7;margin:0">💡 <strong>Mẹo:</strong> Tạo tài khoản hoặc đăng nhập để truy cập video hướng dẫn ngay sau khi nhận hàng. Tất cả kit của bạn sẽ xuất hiện trong <strong>Sản phẩm của tôi</strong>.</p>
-    </div>
   </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
   <!-- Cart body -->
   <div id="cartBody"></div>
@@ -120,8 +164,8 @@ function renderCart() {
 
       <div id="itemsList">
         ${items.map(item => {
-          // Use the snapshot stored on the cart item at add-time. This stays correct even
-          // when the seed catalog changes, and when items added via the API don't appear in PRODUCTS.
+          // Use the snapshot stored on the cart item at add-time, so the cart keeps
+          // showing the price/name the user added even if the catalog changes later.
           const price = Number(item.price) || 0;
           return `
           <div class="cart-item">
@@ -241,24 +285,88 @@ async function submitOrder() {
   btn.disabled = true; btn.textContent = 'Đang đặt hàng...';
   try {
     const items = Cart.items.map(i => ({ productId: i.id, qty: i.qty }));
-    const { order } = await API.orders.create({ items, shippingName: name, shippingPhone: phone, shippingAddress: addr, note: note || undefined });
+    const { order, payment } = await API.orders.create({ items, shippingName: name, shippingPhone: phone, shippingAddress: addr, note: note || undefined });
     document.getElementById('shipping-modal')?.remove();
     Cart.clear();
     document.getElementById('cartBody').style.display = 'none';
-    const successEl = document.getElementById('orderSuccess');
-    if (successEl) {
-      successEl.classList.add('show');
-      const ordId = document.getElementById('successOrderId');
-      if (ordId) ordId.textContent = '#' + order.id.slice(-8).toUpperCase();
-    }
+
     const heroLabel = document.getElementById('cartCountHero');
-    if (heroLabel) heroLabel.textContent = 'Đặt hàng thành công!';
-    Toast.show('Đơn hàng đã được đặt thành công!', 'success');
+    const ordIdShort = '#' + order.id.slice(-8).toUpperCase();
+
+    if (payment) {
+      // Show the QR/payment panel and start polling for confirmation.
+      document.getElementById('pendingOrderId').textContent = ordIdShort;
+      document.getElementById('payQr').src = payment.qrUrl;
+      document.getElementById('payBank').textContent = payment.bankCode;
+      document.getElementById('payAcc').textContent = payment.accountNumber;
+      document.getElementById('payName').textContent = payment.accountName || '';
+      document.getElementById('payMemo').textContent = payment.memo;
+      document.getElementById('payAmount').textContent = payment.amount.toLocaleString('vi-VN') + 'đ';
+      document.getElementById('orderPending').style.display = 'block';
+      if (heroLabel) heroLabel.textContent = 'Đang chờ thanh toán';
+      pollPayment(order.id);
+    } else {
+      // No payment provider configured — fall back to immediate success state.
+      const successEl = document.getElementById('orderSuccess');
+      if (successEl) {
+        successEl.classList.add('show');
+        document.getElementById('successOrderId').textContent = ordIdShort;
+      }
+      if (heroLabel) heroLabel.textContent = 'Đặt hàng thành công!';
+      Toast.show('Đơn hàng đã được đặt thành công!', 'success');
+    }
   } catch(e) {
     errEl.textContent = e.message || 'Đặt hàng thất bại. Thử lại sau.';
     errEl.style.display = 'block';
     btn.disabled = false; btn.textContent = 'Đặt hàng ngay →';
   }
+}
+
+let _pollTimer = null;
+function pollPayment(orderId) {
+  // Poll every 5s for up to 30 minutes. The webhook is what flips the status —
+  // this is just the customer's view catching up.
+  const startedAt = Date.now();
+  const MAX_MS = 30 * 60 * 1000;
+  if (_pollTimer) clearInterval(_pollTimer);
+  _pollTimer = setInterval(async () => {
+    if (Date.now() - startedAt > MAX_MS) { clearInterval(_pollTimer); return; }
+    try {
+      const { order } = await API.orders.get(orderId);
+      if (!order || order.status === 'pending') return; // keep polling
+      clearInterval(_pollTimer);
+      document.getElementById('orderPending').style.display = 'none';
+      const heroLabel = document.getElementById('cartCountHero');
+      if (order.status === 'cancelled') {
+        // Order was cancelled (e.g. by admin) before payment was matched.
+        const cancelEl = document.getElementById('orderPending');
+        cancelEl.innerHTML = `
+          <div style="font-size:3rem;margin-bottom:12px">⚠️</div>
+          <h2 style="margin-bottom:6px">Đơn hàng đã bị hủy</h2>
+          <p style="color:var(--ink-4);font-size:.9rem;margin-bottom:24px">Đơn hàng <strong>#${esc(order.id.slice(-8).toUpperCase())}</strong> đã bị hủy. Vui lòng liên hệ Craftory để được hỗ trợ.</p>
+          <a href="shop.html" class="btn btn-primary btn-lg">Tiếp tục mua sắm</a>`;
+        cancelEl.style.display = 'block';
+        if (heroLabel) heroLabel.textContent = 'Đơn hàng đã bị hủy';
+        Toast.show('Đơn hàng đã bị hủy.', 'error');
+        return;
+      }
+      // Any other non-pending status (processing/shipped/delivered) means paid.
+      const successEl = document.getElementById('orderSuccess');
+      successEl.classList.add('show');
+      document.getElementById('successOrderId').textContent = '#' + order.id.slice(-8).toUpperCase();
+      if (heroLabel) heroLabel.textContent = 'Đặt hàng thành công!';
+      Toast.show('Đã nhận được thanh toán!', 'success');
+    } catch { /* network blip — keep polling */ }
+  }, 5000);
+}
+
+function copyText(elId) {
+  const text = document.getElementById(elId)?.textContent || '';
+  if (!text) return;
+  navigator.clipboard?.writeText(text).then(
+    () => Toast.show('Đã sao chép', 'success'),
+    () => Toast.show('Không sao chép được', 'error')
+  );
 }
 
 renderCart();

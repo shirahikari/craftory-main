@@ -39,11 +39,13 @@ export default async function adminStatsRoutes(fastify) {
 
       fastify.prisma.$queryRaw`
         SELECT
-          "productId"::int AS "productId",
-          SUM(qty)::int AS "totalQty",
-          SUM(qty * "unitPrice")::int AS "totalRevenue"
-        FROM "OrderItem"
-        GROUP BY "productId"
+          oi."productId"::int AS "productId",
+          SUM(oi.qty)::int AS "totalQty",
+          SUM(oi.qty * oi."unitPrice")::int AS "totalRevenue"
+        FROM "OrderItem" oi
+        JOIN "Order" o ON o.id = oi."orderId"
+        WHERE o.status != 'cancelled'
+        GROUP BY oi."productId"
         ORDER BY "totalQty" DESC
         LIMIT 5
       `,

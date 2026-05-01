@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AppError } from '../utils/errors.js';
 
 const regSchema = z.object({
   workshopId: z.string().min(1).max(64),
@@ -31,6 +32,17 @@ export default async function workshopRoutes(fastify) {
   // POST /api/v1/workshops/register
   fastify.post('/workshops/register', {
     config: { rateLimit: { max: 5, timeWindow: '10 minutes' } },
+    preHandler: [async (req) => {
+      // Authenticated registrations bind to req.user.id, so they need CSRF
+      // protection. Guest registrations have no session credential to abuse.
+      if (req.user) {
+        const token = req.headers['x-csrf-token'];
+        const expected = req.session?.data?.csrfToken;
+        if (!token || token !== expected) {
+          throw new AppError('CSRF token không hợp lệ.', 403);
+        }
+      }
+    }],
   }, async (req, reply) => {
     const parsed = regSchema.safeParse(req.body);
     if (!parsed.success) {

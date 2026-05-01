@@ -106,6 +106,14 @@ document.getElementById('modelLabel').textContent = 'Craftory AI · Backend';
 
 const HISTORY=[];
 let selectedImg=null, recognition=null, isRecording=false;
+let _catalog=[];
+
+(async () => {
+  try {
+    const { products } = await API.products.list();
+    _catalog = products.map(normalizeProduct);
+  } catch { _catalog = []; }
+})();
 
 function onAuthChange(){
   const loggedIn=Auth.isLoggedIn();
@@ -167,7 +175,7 @@ async function sendMsg(){
   try{
     const sys=`Bạn là trợ lý AI của Craftory — thương hiệu kit thủ công cho trẻ em 4–12 tuổi tại TP.HCM.
 Trả lời bằng tiếng Việt, thân thiện, ngắn gọn. Dùng **text** để in đậm.
-Sản phẩm: ${PRODUCTS.slice(0,6).map(p=>`${p.name} (${p.price.toLocaleString('vi-VN')}đ, ${p.age})`).join(', ')}...
+Sản phẩm: ${_catalog.slice(0,6).map(p=>`${p.name} (${p.price.toLocaleString('vi-VN')}đ, ${p.age})`).join(', ') || 'đang cập nhật'}...
 ${Auth.isLoggedIn()?`Người dùng hiện tại: ${Auth.user.name}.`:'Người dùng chưa đăng nhập.'}`;
 
     const { reply } = await API.chat.send(HISTORY.slice(-6), sys);

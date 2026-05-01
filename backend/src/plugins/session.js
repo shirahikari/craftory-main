@@ -49,17 +49,33 @@ export const sessionPlugin = fp(async (fastify) => {
     return { csrfToken };
   });
 
-  // Deletes DB session and clears cookie
+  // Deletes DB session and clears cookie. Cookie attributes must mirror those
+  // set in setSession or some browsers (notably Safari) refuse the overwrite.
   fastify.decorate('clearSession', async (req, reply) => {
     const sessionId = req.cookies[SESSION_COOKIE];
     if (sessionId) {
       await fastify.prisma.session.deleteMany({ where: { id: sessionId } }).catch(() => {});
     }
-    reply.clearCookie(SESSION_COOKIE, { path: '/' });
+    reply.clearCookie(SESSION_COOKIE, {
+      path: '/',
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'Strict',
+    });
   });
 
-  // Cleanup expired sessions (runs on startup)
-  fastify.addHook('onReady', async () => {
+  // Cleanup expired sessions on startup, then every hour.
+  const cleanupExpired = () =>
     fastify.prisma.session.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => {});
+
+  let cleanupTimer = null;
+  fastify.addHook('onReady', async () => {
+    cleanupExpired();
+    cleanupTimer = setInterval(cleanupExpired, 60 * 60 * 1000);
+    cleanupTimer.unref?.();
+  });
+
+  fastify.addHook('onClose', async () => {
+    if (cleanupTimer) clearInterval(cleanupTimer);
   });
 });

@@ -16,8 +16,24 @@ import adminUserRoutes from './routes/admin/users.js';
 import adminProductRoutes from './routes/admin/products.js';
 import adminOrderRoutes from './routes/admin/orders.js';
 import adminStatsRoutes from './routes/admin/stats.js';
+import adminWorkshopRoutes from './routes/admin/workshops.js';
+import sepayWebhookRoutes from './routes/webhooks/sepay.js';
 
 const isProd = process.env.NODE_ENV === 'production';
+
+if (isProd && !process.env.COOKIE_SECRET) {
+  console.error('FATAL: COOKIE_SECRET must be set in production.');
+  process.exit(1);
+}
+
+if (isProd) {
+  for (const v of ['SEPAY_API_KEY', 'SEPAY_ACCOUNT_NUMBER', 'SEPAY_BANK_CODE']) {
+    if (!process.env[v]) {
+      console.error(`FATAL: ${v} must be set in production for SePay payments.`);
+      process.exit(1);
+    }
+  }
+}
 
 const app = Fastify({
   logger: { level: isProd ? 'warn' : 'info' },
@@ -43,9 +59,12 @@ await app.register(fastifyCors, {
 });
 
 // Cookie parser (needed for session cookie reading)
-await app.register(fastifyCookie, {
-  secret: process.env.COOKIE_SECRET || 'craftory-dev-change-this-in-production-use-32-char-random-string',
-});
+const cookieSecret = process.env.COOKIE_SECRET
+  || 'craftory-dev-change-this-in-production-use-32-char-random-string';
+if (!isProd && !process.env.COOKIE_SECRET) {
+  console.warn('WARN: COOKIE_SECRET not set, using insecure development default.');
+}
+await app.register(fastifyCookie, { secret: cookieSecret });
 
 // Database via Prisma
 await app.register(prismaPlugin);
@@ -81,6 +100,8 @@ await app.register(adminUserRoutes,    { prefix: '/api/v1/admin' });
 await app.register(adminProductRoutes, { prefix: '/api/v1/admin' });
 await app.register(adminOrderRoutes,   { prefix: '/api/v1/admin' });
 await app.register(adminStatsRoutes,   { prefix: '/api/v1/admin' });
+await app.register(adminWorkshopRoutes,{ prefix: '/api/v1/admin' });
+await app.register(sepayWebhookRoutes, { prefix: '/api/v1/webhooks' });
 
 app.setErrorHandler(errorHandler);
 

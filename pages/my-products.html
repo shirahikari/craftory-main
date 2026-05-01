@@ -92,6 +92,19 @@ const KP_KEY = 'crf_kit_progress';
 function getProgress() { try { return JSON.parse(localStorage.getItem(KP_KEY) || '{}'); } catch { return {}; } }
 function saveProgress(pid, data) { const p = getProgress(); p[pid] = data; localStorage.setItem(KP_KEY, JSON.stringify(p)); }
 
+let _catalog = [];
+
+async function ensureCatalog() {
+  if (_catalog.length) return _catalog;
+  try {
+    const { products } = await API.products.list();
+    _catalog = products.map(normalizeProduct);
+  } catch {
+    _catalog = [];
+  }
+  return _catalog;
+}
+
 function onAuthChange() {
   if (!Auth.isLoggedIn()) {
     document.getElementById('lockedView').style.display = 'block';
@@ -107,24 +120,24 @@ function onAuthChange() {
 }
 
 async function loadPurchasedKits() {
-  try {
-    const { orders } = await API.orders.list();
-    // Collect unique purchased product IDs from delivered/shipped orders
-    const purchasedIds = new Set();
-    orders.forEach(o => {
-      if (!['cancelled'].includes(o.status)) {
-        o.items.forEach(i => purchasedIds.add(i.productId));
-      }
-    });
-    renderKits({ purchases: [...purchasedIds] });
-  } catch(e) {
-    renderKits({ purchases: [] });
-  }
+  // Catalog and orders are independent — fetch in parallel.
+  const [_, ordersResult] = await Promise.all([
+    ensureCatalog(),
+    API.orders.list().catch(() => ({ orders: [] })),
+  ]);
+  const orders = ordersResult.orders || [];
+  const purchasedIds = new Set();
+  orders.forEach(o => {
+    if (!['cancelled'].includes(o.status)) {
+      o.items.forEach(i => purchasedIds.add(i.productId));
+    }
+  });
+  renderKits({ purchases: [...purchasedIds] });
 }
 
 function renderKits(user) {
   const purchases = user.purchases || [];
-  const kits = PRODUCTS.filter(p => purchases.includes(p.id) && p.cat === 'kit');
+  const kits = _catalog.filter(p => purchases.includes(p.id) && p.cat === 'kit');
   const prog = getProgress();
   const totalDone = kits.filter(k => (prog[k.id]?.pct || 0) >= 100).length;
   const anyProgress = kits.some(k => prog[k.id]);
@@ -278,7 +291,7 @@ function processUpload(file, pid) {
 
 async function callAI(file, pid) {
   const fb = document.getElementById('rFb_' + pid);
-  const p = PRODUCTS.find(x => x.id === pid) || { name: 'kit' };
+  const p = _catalog.find(x => x.id === pid) || { name: 'kit' };
   try {
     const { reply } = await API.chat.send(
       [{ role: 'user', content: `Bé đã hoàn thành bộ kit thủ công "${p.name}" và vừa tải ảnh tác phẩm lên. Hãy khen ngợi điểm sáng tạo và nỗ lực của bé, đưa ra 1-2 gợi ý cải thiện nhẹ nhàng và tích cực, rồi khuyến khích bé tiếp tục sáng tạo.` }],

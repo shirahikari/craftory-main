@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AppError } from '../../utils/errors.js';
-import { requireEmployee, requireCsrf } from '../../middleware/rbac.js';
+import { requireEmployee, requireCsrf, requireAdmin } from '../../middleware/rbac.js';
 
 // Reject any string containing HTML angle brackets — defense-in-depth against stored XSS.
 const noHtml = (label) => z.string().refine(
@@ -38,6 +38,28 @@ export default async function adminProductRoutes(fastify) {
       orderBy: { id: 'asc' },
     });
     return { products };
+  });
+
+  // GET /api/v1/admin/products/sales — lifetime sold qty + revenue per product,
+  // including products with zero sales. Cancelled orders are excluded.
+  fastify.get('/products/sales', { preHandler: [requireAdmin] }, async () => {
+    const rows = await fastify.prisma.$queryRaw`
+      SELECT
+        p.id::int AS "id",
+        p.name AS "name",
+        p.emoji AS "emoji",
+        p.price::int AS "price",
+        p.status AS "status",
+        COALESCE(SUM(oi.qty) FILTER (WHERE o.status != 'cancelled'), 0)::int AS "totalQty",
+        COALESCE(SUM(oi.qty * oi."unitPrice") FILTER (WHERE o.status != 'cancelled'), 0)::int AS "totalRevenue",
+        COUNT(DISTINCT o.id) FILTER (WHERE o.status != 'cancelled')::int AS "orderCount"
+      FROM "Product" p
+      LEFT JOIN "OrderItem" oi ON oi."productId" = p.id
+      LEFT JOIN "Order" o ON o.id = oi."orderId"
+      GROUP BY p.id, p.name, p.emoji, p.price, p.status
+      ORDER BY "totalQty" DESC, p.id ASC
+    `;
+    return { products: rows };
   });
 
   // POST /api/v1/admin/products

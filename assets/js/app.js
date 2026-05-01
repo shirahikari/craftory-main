@@ -10,40 +10,6 @@ function esc(s) {
   return d.innerHTML;
 }
 
-/* ── Products (local catalog for rendering) ── */
-const PRODUCTS = [
-  { id:1,  name:"Origami Rừng Nhiệt Đới",   em:"🦜", col:"Jungle Friends",      cat:"kit",  age:"4–6 tuổi",  price:59000,  old:null,   badge:"hot",  bg:"#F0FDF4",
-    desc:"Khám phá thế giới động vật nhiệt đới qua nghệ thuật gấp giấy origami. Bé gấp chim toucan, ếch, khỉ và bướm rồi trưng bày trong khung kraft xinh xắn.",
-    inc:["60 tờ giấy origami màu nhiệt đới (15×15 cm)","Giấy hướng dẫn minh hoạ 4 mẫu: toucan, ếch, khỉ, bướm","Khung trưng bày bìa cứng kraft","Nhãn dán trang trí chủ đề rừng nhiệt đới"] },
-  { id:2,  name:"Mặt Nạ Thú Rừng",          em:"🦁", col:"Animal Kingdom",       cat:"kit",  age:"4–6 tuổi",  price:65000,  old:80000,  badge:"sale", bg:"#FEF9E7",
-    desc:"Tự tay tô màu và hoàn thiện 4 chiếc mặt nạ thú rừng bằng màu nước. Sư tử, cáo, gấu, thỏ — mỗi chiếc là một tác phẩm riêng do bé sáng tạo.",
-    inc:["4 tấm mặt nạ bìa cứng cắt sẵn (sư tử, cáo, gấu, thỏ)","Bảng màu nước 8 màu dạng bánh","Cọ vẽ lông mềm","Dây thun đeo mặt nạ","Nhãn dán mắt & mũi trang trí","Thẻ hướng dẫn tô màu in màu"] },
-  { id:3,  name:"Vòng Tay & Trang Sức",     em:"💎", col:"Little Jewels",        cat:"kit",  age:"6–9 tuổi",  price:75000,  old:null,   badge:"new",  bg:"#FDF4FF",
-    desc:"Thiết kế và làm 5 mẫu vòng tay handmade từ hạt cườm nhiều màu, dây đàn hồi và charm kim loại. Phát triển khéo léo đôi tay và óc thẩm mỹ.",
-    inc:["Hộp phân loại hạt cườm nhiều màu & hình (tròn, sao, tim)","Dây đàn hồi trong suốt","Dây da mỏng","Charm kim loại (sao, tim, bướm, mặt trăng)","Kim xâu hạt","Giấy hướng dẫn 5 mẫu vòng tay"] },
-  { id:4,  name:"Thiệp Pop-up 3D",          em:"💌", col:"Paper Magic",          cat:"kit",  age:"6–9 tuổi",  price:89000,  old:null,   badge:null,   bg:"#FFF0F5",
-    desc:"Tạo những tấm thiệp pop-up 3D bất ngờ với hoa nở, lâu đài và cầu vồng. Mỗi tấm thiệp handmade là món quà độc đáo bé tự làm tặng người thân.",
-    inc:["4 tờ bìa cứng pastel cắt rãnh sẵn (hồng, xanh dương, vàng, xanh lá)","Giấy trang trí hoạ tiết","Kéo đầu tròn an toàn","Keo stick","Bút marker 6 màu tươi","Nhãn dán (hoa, sao, tim)","4 phong bì trắng","Giấy hướng dẫn gấp pop-up 3D"] },
-  { id:5,  name:"Tranh Cát Nghệ Thuật",     em:"🐢", col:"Sandy Canvas",         cat:"kit",  age:"4–6 tuổi",  price:72000,  old:90000,  badge:"sale", bg:"#FFF7ED",
-    desc:"Rắc cát màu lên khung hình có keo sẵn để tạo bức tranh sinh động. Bé phát triển kỹ năng tập trung và phối màu qua nghệ thuật cát đơn giản mà thú vị.",
-    inc:["2 khung tranh bìa cứng có keo sẵn (rùa biển & sao biển)","8 ống cát màu (đỏ, cam, vàng, xanh lá, xanh ngọc, xanh dương, tím, trắng)","Que đổ cát gỗ nhỏ","Thẻ hướng dẫn minh hoạ"] },
-  { id:6,  name:"Mô Hình 3D Giấy",          em:"🗼", col:"Architecture Jr.",     cat:"kit",  age:"9–12 tuổi", price:68000,  old:null,   badge:"new",  bg:"#EEF2FF",
-    desc:"Lắp ráp mô hình tháp Eiffel 3D từ bìa cứng đã in và cắt sẵn. Rèn luyện tư duy không gian, sự kiên nhẫn và kỹ năng lắp ghép cho bé.",
-    inc:["4 tờ bìa cứng dày đã in & cắt rãnh sẵn (tông vàng & kem)","Dụng cụ gấp bone folder","Keo dán chuyên dụng","4 kẹp mini","Giấy hướng dẫn lắp ghép 32 trang (hình 3D từng bước)"] },
-  { id:7,  name:"Vẽ & Tô Màu Khoa Học",    em:"🔭", col:"Science Art",          cat:"kit",  age:"6–9 tuổi",  price:85000,  old:null,   badge:null,   bg:"#EFF6FF",
-    desc:"Tô màu những bức vẽ khoa học thú vị — hệ mặt trời, bộ xương khủng long, cơ thể người và thế giới đại dương. Học khoa học bằng màu sắc và đôi bàn tay.",
-    inc:["4 tờ tranh khoa học khổ lớn (hệ mặt trời, khủng long, cơ thể người, đại dương)","Bộ bút sáp 12 màu không độc","Bút lông màu 6 màu tươi","Nhãn dán ngôi sao khen thưởng","Thước kẻ trong suốt","Sách khoa học mini 20 trang"] },
-  { id:8,  name:"Đồ Chơi Gỗ Chuyển Động",  em:"🚗", col:"STEM Builders",        cat:"kit",  age:"6–9 tuổi",  price:79000,  old:95000,  badge:"sale", bg:"#FEF3C7",
-    desc:"Lắp ráp và sơn xe ô tô đồ chơi bằng gỗ birch thật. Từ mảnh gỗ, bánh xe nhựa đến dây cao su — trải nghiệm STEM thực chiến: thiết kế, lắp ghép, hoàn thiện.",
-    inc:["Các mảnh gỗ birch cắt sẵn (thân xe)","4 bánh xe nhựa màu (đỏ, vàng, xanh lá, xanh dương)","2 trục quay nhựa","Dây cao su","Đinh nhỏ","Búa nhựa mini an toàn","Màu nước 4 màu & cọ vẽ","Giấy hướng dẫn lắp ráp xe & máy bay"] },
-  { id:9,  name:"Nến & Xà Phòng Thủ Công", em:"🕯️", col:"Little Botanist",      cat:"kit",  age:"9–12 tuổi", price:60000,  old:null,   badge:null,   bg:"#F5F0FF",
-    desc:"Tự tay làm nến đậu nành và xà phòng glycerin thơm từ hương liệu thiên nhiên. Bé học về khoa học chất liệu và trải nghiệm niềm vui tạo ra sản phẩm thực sự dùng được.",
-    inc:["Sáp đậu nành tự nhiên (đủ làm 2 nến)","2 lọ hương liệu thiên nhiên (oải hương & cam)","4 viên thuốc nhuộm màu an toàn (hồng, vàng, xanh, tím)","2 tim nến cotton đế kim loại","2 cốc đổ nến nhựa trong","Que khuấy gỗ","2 khuôn silicon vuông (xà phòng)","Nền xà phòng glycerin trong","Thẻ hướng dẫn an toàn & từng bước"] },
-  { id:10, name:"Sách Origami Cơ Bản",      em:"📗", col:"Giấy hướng dẫn",      cat:"book", age:"4–9 tuổi",  price:60000,  old:null,   badge:null,   bg:"#F0FDF4",
-    desc:"50 mẫu origami từ dễ đến khó với hướng dẫn từng bước bằng hình ảnh màu sắc. Cuốn sách bạn đồng hành lý tưởng cho bé bắt đầu hành trình gấp giấy.",
-    inc:["128 trang in màu full","50 mẫu origami chia theo cấp độ (dễ → nâng cao)","Hướng dẫn step-by-step bằng hình minh hoạ","Trang tô màu sáng tạo bonus","Giấy can tặng kèm để tập gấp"] },
-];
-
 /* ── Product normalizer (API → display keys) ── */
 function normalizeProduct(p) {
   return {
@@ -97,8 +63,8 @@ const Cart = (() => {
     add(pid, qty=1, product) {
       _load();
       // Caller may pass the product explicitly (preferred when sourced from API).
-      // Fallback: check API-loaded catalog, then seeded PRODUCTS array.
-      const src = product || _catalog[pid] || (typeof PRODUCTS !== 'undefined' ? PRODUCTS.find(x=>x.id===pid) : null);
+      // Otherwise resolve via the API-loaded catalog registered by the page.
+      const src = product || _catalog[pid];
       if (!src) { Toast.show('Không tìm thấy sản phẩm', 'error'); return; }
       const p = _normalize(src);
       const ex = _items.find(x=>x.id===pid);
@@ -174,12 +140,29 @@ const Auth = (() => {
     },
 
     async logout() {
-      try { await API.auth.logout(); } catch {}
+      // Treat 401/403 as "already logged out" — the cookie/session is invalid,
+      // which is the state we want anyway. Any other error means the server
+      // didn't clear the session: refuse to lie to the user about being signed out.
+      let cleared = true;
+      try {
+        await API.auth.logout();
+      } catch (err) {
+        if (err.status !== 401 && err.status !== 403) {
+          cleared = false;
+        }
+      }
+      if (!cleared) {
+        Toast.show('Đăng xuất thất bại — vui lòng thử lại. Phiên đăng nhập vẫn còn.', 'error');
+        return;
+      }
       _user = null;
-      _ready = false;
       _updateUI();
-      Toast.show('Đã đăng xuất. Hẹn gặp lại!');
       if (typeof onAuthChange === 'function') onAuthChange(null);
+      Toast.show('Đã đăng xuất. Hẹn gặp lại!');
+      // Hard navigation to home so any in-memory page state (admin tables,
+      // employee dashboards) is wiped and not just hidden. location.replace
+      // avoids leaving a gated page in browser history.
+      setTimeout(() => { window.location.replace('/'); }, 400);
     },
 
     setUser(user) { _user = user; _updateUI(); },

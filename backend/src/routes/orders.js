@@ -2,6 +2,25 @@ import { z } from 'zod';
 import { AppError } from '../utils/errors.js';
 import { requireAuth, requireCsrf } from '../middleware/rbac.js';
 
+// Build the payment-instruction payload for an order. Returns null in dev when
+// SePay isn't configured, so the existing flow still works without payments.
+function buildPaymentInfo(order) {
+  const acc = process.env.SEPAY_ACCOUNT_NUMBER;
+  const bank = process.env.SEPAY_BANK_CODE;
+  const name = process.env.SEPAY_ACCOUNT_NAME;
+  if (!acc || !bank) return null;
+  const memo = 'CRAFTORY-' + order.id.slice(-8).toUpperCase();
+  const qrUrl = `https://qr.sepay.vn/img?acc=${encodeURIComponent(acc)}&bank=${encodeURIComponent(bank)}&amount=${order.total}&des=${encodeURIComponent(memo)}`;
+  return {
+    qrUrl,
+    bankCode: bank,
+    accountNumber: acc,
+    accountName: name || '',
+    memo,
+    amount: order.total,
+  };
+}
+
 const orderItemSchema = z.object({
   productId: z.number().int().positive(),
   qty: z.number().int().min(1).max(99),
@@ -69,7 +88,7 @@ export default async function orderRoutes(fastify) {
     });
 
     reply.code(201);
-    return { order };
+    return { order, payment: buildPaymentInfo(order) };
   });
 
   // GET /api/v1/orders
@@ -97,6 +116,8 @@ export default async function orderRoutes(fastify) {
       },
     });
     if (!order) return reply.code(404).send({ message: 'Không tìm thấy đơn hàng.' });
-    return { order };
+    // Show payment info while still pending; once paid the customer doesn't need it.
+    const payment = order.status === 'pending' ? buildPaymentInfo(order) : null;
+    return { order, payment };
   });
 }

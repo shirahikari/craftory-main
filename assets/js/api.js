@@ -91,9 +91,18 @@ const API = {
     },
 
     async logout() {
-      const result = await _fetch('/auth/logout', { method: 'POST' });
-      _csrfToken = null;
-      return result;
+      // Only drop the in-memory CSRF token when the session is *actually*
+      // gone — i.e. on success or when the server says the session is already
+      // invalid (401/403). On 5xx or network failure the session is likely
+      // still alive on the server, so keeping the token enables a clean retry.
+      try {
+        const result = await _fetch('/auth/logout', { method: 'POST' });
+        _csrfToken = null;
+        return result;
+      } catch (err) {
+        if (err.status === 401 || err.status === 403) _csrfToken = null;
+        throw err;
+      }
     },
 
     async getCsrf() {
@@ -123,10 +132,12 @@ const API = {
   admin: {
     users: {
       list()          { return _fetch('/admin/users'); },
+      create(d)       { return _fetch('/admin/users', { method: 'POST', body: JSON.stringify(d) }); },
       update(id, d)   { return _fetch(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(d) }); },
     },
     products: {
       list(params = {})   { return _fetch('/admin/products?' + new URLSearchParams(params)); },
+      sales()             { return _fetch('/admin/products/sales'); },
       create(d)           { return _fetch('/admin/products', { method: 'POST', body: JSON.stringify(d) }); },
       update(id, d)       { return _fetch(`/admin/products/${id}`, { method: 'PUT', body: JSON.stringify(d) }); },
       remove(id)          { return _fetch(`/admin/products/${id}`, { method: 'DELETE' }); },
@@ -134,6 +145,9 @@ const API = {
     orders: {
       list(params = {})        { return _fetch('/admin/orders?' + new URLSearchParams(params)); },
       updateStatus(id, status) { return _fetch(`/admin/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }); },
+    },
+    workshops: {
+      stats() { return _fetch('/admin/workshops/stats'); },
     },
     stats() { return _fetch('/admin/stats'); },
   },

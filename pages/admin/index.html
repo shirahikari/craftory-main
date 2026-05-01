@@ -43,6 +43,8 @@
   <a href="#" onclick="showSection('dashboard');return false" class="active" id="nav-dashboard">📊 Dashboard</a>
   <a href="#" onclick="showSection('users');return false" id="nav-users">👥 Người dùng</a>
   <a href="#" onclick="showSection('orders');return false" id="nav-orders">📦 Đơn hàng</a>
+  <a href="#" onclick="showSection('sales');return false" id="nav-sales">💰 Báo cáo bán hàng</a>
+  <a href="#" onclick="showSection('workshops');return false" id="nav-workshops">🎓 Workshop</a>
   <div class="divider"></div>
   <a href="../employee/products.html">🎨 Quản lý sản phẩm</a>
   <a href="../../index.html">🏠 Trang chủ</a>
@@ -103,7 +105,10 @@
 
     <!-- Users Section -->
     <section id="sec-users" style="display:none">
-      <h1 style="font-size:1.5rem;margin-bottom:20px">Quản lý người dùng</h1>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <h1 style="font-size:1.5rem;margin:0">Quản lý người dùng</h1>
+        <button class="btn btn-primary" onclick="openAddUserModal()">+ Thêm người dùng</button>
+      </div>
       <div class="admin-card">
         <div style="overflow-x:auto">
           <table class="admin-table">
@@ -113,6 +118,51 @@
         </div>
       </div>
     </section>
+
+    <!-- Add user modal -->
+    <div class="modal-overlay" id="add-user-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;overflow-y:auto;padding:20px">
+      <div style="background:var(--surface);border-radius:var(--r-xl);padding:28px;width:100%;max-width:480px;margin:auto;position:relative">
+        <button style="position:absolute;top:12px;right:14px;font-size:1.3rem;color:var(--ink-3);background:none;border:none;cursor:pointer" onclick="closeAddUserModal()" aria-label="Đóng">✕</button>
+        <h2 style="margin-bottom:18px;font-size:1.2rem">Thêm người dùng mới</h2>
+        <form id="add-user-form" onsubmit="submitAddUser(event)">
+          <div class="form-group">
+            <label class="form-label">Họ và tên <span class="required">*</span></label>
+            <input class="form-input" type="text" id="au-name" required minlength="2" maxlength="100" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email <span class="required">*</span></label>
+            <input class="form-input" type="email" id="au-email" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mật khẩu tạm <span class="required">*</span></label>
+            <input class="form-input" type="text" id="au-password" required minlength="6" maxlength="200" autocomplete="new-password">
+            <div class="form-hint">Tối thiểu 6 ký tự. Người dùng nên đổi sau lần đăng nhập đầu.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">Vai trò <span class="required">*</span></label>
+              <select class="form-input" id="au-role" required>
+                <option value="customer">Khách hàng</option>
+                <option value="employee">Nhân viên</option>
+                <option value="admin">Quản trị viên</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Trạng thái</label>
+              <select class="form-input" id="au-status">
+                <option value="active">Hoạt động</option>
+                <option value="disabled">Vô hiệu</option>
+              </select>
+            </div>
+          </div>
+          <div id="au-err" style="display:none;color:var(--rose);margin-bottom:12px;font-size:.85rem"></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+            <button type="button" class="btn btn-ghost" onclick="closeAddUserModal()">Hủy</button>
+            <button type="submit" id="au-submit" class="btn btn-primary">Tạo tài khoản</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Orders Section -->
     <section id="sec-orders" style="display:none">
@@ -132,6 +182,63 @@
       </div>
     </section>
 
+    <!-- Sales Report Section -->
+    <section id="sec-sales" style="display:none">
+      <h1 style="font-size:1.5rem;margin-bottom:8px">Báo cáo bán hàng</h1>
+      <p style="margin:0 0 16px;color:var(--ink-4);font-size:.86rem">Số lượng bán và doanh thu theo từng sản phẩm (đã loại đơn hủy).</p>
+      <div class="admin-card">
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th style="text-align:right">Đã bán</th>
+                <th style="text-align:right">Số đơn</th>
+                <th style="text-align:right">Doanh thu</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody id="sales-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--ink-4)">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workshops Section -->
+    <section id="sec-workshops" style="display:none">
+      <h1 style="font-size:1.5rem;margin-bottom:8px">Workshop</h1>
+      <p style="margin:0 0 16px;color:var(--ink-4);font-size:.86rem">Số lượng đăng ký theo từng buổi và từng địa điểm tổ chức.</p>
+
+      <div class="stat-grid" id="ws-totals">
+        <div class="stat-card" style="--accent:var(--orange)"><div class="stat-num" id="ws-tot-w">—</div><div class="stat-label">Số workshop</div></div>
+        <div class="stat-card" style="--accent:var(--blue)"><div class="stat-num" id="ws-tot-c">—</div><div class="stat-label">Tổng sức chứa</div></div>
+        <div class="stat-card" style="--accent:var(--green)"><div class="stat-num" id="ws-tot-r">—</div><div class="stat-label">Tổng đăng ký</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px">
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Theo từng workshop</h3></div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Workshop</th><th>Ngày</th><th>Địa điểm</th><th style="text-align:right">Đăng ký / Sức chứa</th></tr></thead>
+              <tbody id="ws-list-tbody"><tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-4)">Đang tải...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>Theo địa điểm (venue)</h3></div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Địa điểm</th><th style="text-align:right">Buổi</th><th style="text-align:right">Đăng ký</th></tr></thead>
+              <tbody id="ws-loc-tbody"><tr><td colspan="3" style="text-align:center;padding:24px;color:var(--ink-4)">Đang tải...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </main>
 
@@ -142,15 +249,18 @@
 const STATUS_VN  = { pending:'Chờ xác nhận', processing:'Đang xử lý', shipped:'Đang giao', delivered:'Đã giao', cancelled:'Đã hủy' };
 const STATUS_OPT = ['pending','processing','shipped','delivered','cancelled'];
 let _ordPage=1, _ordSearch='', _ordTimer;
+let _users = [];
 
 function showSection(sec) {
-  ['dashboard','users','orders'].forEach(s => {
+  ['dashboard','users','orders','sales','workshops'].forEach(s => {
     document.getElementById('sec-'+s).style.display = s===sec ? '' : 'none';
     document.getElementById('nav-'+s)?.classList.toggle('active', s===sec);
   });
   if (sec==='dashboard') loadDashboard();
   if (sec==='users') loadUsers();
   if (sec==='orders') { _ordPage=1; loadAdminOrders(); }
+  if (sec==='sales') loadSales();
+  if (sec==='workshops') loadWorkshopStats();
 }
 
 async function loadDashboard() {
@@ -204,6 +314,7 @@ async function loadUsers() {
   const tbody = document.getElementById('users-tbody');
   try {
     const { users } = await API.admin.users.list();
+    _users = users;
     tbody.innerHTML = users.map(u => `
       <tr>
         <td style="font-weight:600">${esc(u.name)}</td>
@@ -235,9 +346,19 @@ async function updateUserRole(id, role) {
 }
 async function toggleUser(id, current) {
   const ns = current==='active'?'disabled':'active';
-  if (!confirm(`${ns==='disabled'?'Vô hiệu hóa':'Kích hoạt'} tài khoản này?`)) return;
-  try { await API.admin.users.update(id, { status: ns }); Toast.show('Đã cập nhật', 'success'); await loadUsers(); }
-  catch(e) { Toast.show('Lỗi: '+e.message, 'error'); }
+  const target = _users.find(u => u.id === id);
+  const name = target?.name || 'tài khoản này';
+  const msg = ns === 'disabled'
+    ? `Vô hiệu hóa tài khoản của ${name}?\n\nHọ sẽ không thể đăng nhập, nhưng đơn hàng và lịch sử vẫn được giữ. Có thể kích hoạt lại bất cứ lúc nào.`
+    : `Kích hoạt lại tài khoản của ${name}?\n\nHọ sẽ có thể đăng nhập trở lại.`;
+  if (!confirm(msg)) return;
+  try {
+    await API.admin.users.update(id, { status: ns });
+    Toast.show(ns === 'disabled' ? `Đã vô hiệu hóa ${name}` : `Đã kích hoạt ${name}`, 'success');
+    await loadUsers();
+  } catch(e) {
+    Toast.show('Lỗi: ' + e.message, 'error');
+  }
 }
 
 function debounceOrdSearch() {
@@ -280,6 +401,117 @@ async function loadAdminOrders() {
 async function updateOrdStatus(sel) {
   try { await API.admin.orders.updateStatus(sel.dataset.id, sel.value); Toast.show('Đã cập nhật', 'success'); }
   catch(e) { Toast.show('Lỗi: '+e.message, 'error'); loadAdminOrders(); }
+}
+
+function openAddUserModal() {
+  document.getElementById('add-user-form').reset();
+  document.getElementById('au-err').style.display = 'none';
+  document.getElementById('au-status').value = 'active';
+  document.getElementById('au-role').value = 'customer';
+  document.getElementById('add-user-modal').style.display = 'flex';
+}
+function closeAddUserModal() {
+  document.getElementById('add-user-modal').style.display = 'none';
+}
+async function submitAddUser(e) {
+  e.preventDefault();
+  const errEl = document.getElementById('au-err');
+  const submit = document.getElementById('au-submit');
+  errEl.style.display = 'none';
+  const data = {
+    name: document.getElementById('au-name').value.trim(),
+    email: document.getElementById('au-email').value.trim(),
+    password: document.getElementById('au-password').value,
+    role: document.getElementById('au-role').value,
+    status: document.getElementById('au-status').value,
+  };
+  submit.disabled = true; submit.textContent = 'Đang tạo...';
+  try {
+    const { user } = await API.admin.users.create(data);
+    Toast.show(`Đã tạo tài khoản ${user.name}`, 'success');
+    closeAddUserModal();
+    await loadUsers();
+  } catch(err) {
+    errEl.textContent = err.message || 'Không thể tạo tài khoản.';
+    errEl.style.display = 'block';
+  } finally {
+    submit.disabled = false; submit.textContent = 'Tạo tài khoản';
+  }
+}
+
+async function loadSales() {
+  const tbody = document.getElementById('sales-tbody');
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--ink-4)">Đang tải...</td></tr>`;
+  try {
+    const { products } = await API.admin.products.sales();
+    const STATUS_LBL = { published:'Đang bán', draft:'Bản nháp', archived:'Lưu trữ' };
+    if (!products.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--ink-4)">Chưa có sản phẩm.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = products.map(p => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:1.2rem">${esc(p.emoji||'🎨')}</span>
+            <div>
+              <div style="font-weight:600;font-size:.86rem">${esc(p.name)}</div>
+              <div style="font-size:.72rem;color:var(--ink-4)">${(p.price||0).toLocaleString('vi-VN')}đ</div>
+            </div>
+          </div>
+        </td>
+        <td style="text-align:right;font-family:var(--font-h);font-weight:700">${(p.totalQty||0).toLocaleString('vi-VN')}</td>
+        <td style="text-align:right;font-family:var(--font-h)">${(p.orderCount||0).toLocaleString('vi-VN')}</td>
+        <td style="text-align:right;font-family:var(--font-h);font-weight:700;color:var(--orange)">${(p.totalRevenue||0).toLocaleString('vi-VN')}đ</td>
+        <td style="font-size:.78rem">${STATUS_LBL[p.status]||esc(p.status)}</td>
+      </tr>`).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--rose);text-align:center;padding:24px">${e.message}</td></tr>`;
+  }
+}
+
+async function loadWorkshopStats() {
+  const listTbody = document.getElementById('ws-list-tbody');
+  const locTbody = document.getElementById('ws-loc-tbody');
+  listTbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-4)">Đang tải...</td></tr>`;
+  locTbody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--ink-4)">Đang tải...</td></tr>`;
+  try {
+    const { workshops, byLocation, totals } = await API.admin.workshops.stats();
+    document.getElementById('ws-tot-w').textContent = totals.workshopCount || 0;
+    document.getElementById('ws-tot-c').textContent = (totals.totalCapacity || 0).toLocaleString('vi-VN');
+    document.getElementById('ws-tot-r').textContent = (totals.totalRegistrations || 0).toLocaleString('vi-VN');
+
+    listTbody.innerHTML = workshops.length ? workshops.map(w => {
+      const dt = new Date(w.dateTime).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      const pct = w.pctFull;
+      const barColor = pct >= 90 ? 'var(--rose)' : pct >= 60 ? 'var(--orange)' : 'var(--green)';
+      return `
+      <tr>
+        <td>
+          <div style="font-weight:600;font-size:.85rem">${esc(w.title)}</div>
+          <div style="font-size:.7rem;color:var(--ink-4)">${w.upcoming?'Sắp tới':'Đã diễn ra'}</div>
+        </td>
+        <td style="font-size:.78rem;color:var(--ink-3)">${esc(dt)}</td>
+        <td style="font-size:.78rem;color:var(--ink-3);max-width:280px">${esc(w.location)}</td>
+        <td style="text-align:right;min-width:160px">
+          <div style="font-family:var(--font-h);font-weight:700">${w.registrations}/${w.capacity}</div>
+          <div style="height:5px;background:var(--parchment);border-radius:var(--r-full);overflow:hidden;margin-top:4px">
+            <div style="height:100%;width:${Math.min(100,pct)}%;background:${barColor}"></div>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-4)">Chưa có workshop.</td></tr>`;
+
+    locTbody.innerHTML = byLocation.length ? byLocation.map(l => `
+      <tr>
+        <td style="font-size:.82rem">${esc(l.location)}</td>
+        <td style="text-align:right;font-family:var(--font-h);font-weight:700">${l.workshopCount}</td>
+        <td style="text-align:right;font-family:var(--font-h);font-weight:700;color:var(--orange)">${l.totalRegistrations}</td>
+      </tr>`).join('') : `<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--ink-4)">Chưa có dữ liệu.</td></tr>`;
+  } catch(e) {
+    listTbody.innerHTML = `<tr><td colspan="4" style="color:var(--rose);text-align:center;padding:24px">${e.message}</td></tr>`;
+    locTbody.innerHTML = `<tr><td colspan="3" style="color:var(--rose);text-align:center;padding:24px">${e.message}</td></tr>`;
+  }
 }
 
 Auth.onReady(async user => {

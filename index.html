@@ -367,29 +367,47 @@
 document.getElementById('hdr').innerHTML = renderHeader('home','');
 document.getElementById('ftr').innerHTML = renderFooter('');
 
-// Featured: first 2 hot/new + 2 more
-const featured = [
-  ...PRODUCTS.filter(p => p.badge === 'hot').slice(0,2),
-  ...PRODUCTS.filter(p => p.badge === 'new').slice(0,1),
-  ...PRODUCTS.filter(p => !p.badge && p.cat === 'kit').slice(0,1),
-].slice(0,4);
-document.getElementById('featuredGrid').innerHTML = featured.map(p => productCardHTML(p,'')).join('');
+const BASE_IMG = 'assets/images/product-images/';
+
+(async function bootstrapStorefront() {
+  let catalog = [];
+  try {
+    const { products } = await API.products.list();
+    catalog = products.map(normalizeProduct);
+  } catch {
+    document.getElementById('featuredGrid').innerHTML =
+      `<div style="grid-column:1/-1;text-align:center;color:var(--ink-4);padding:32px">Không tải được sản phẩm. Vui lòng thử lại sau.</div>`;
+  }
+
+  // Make the catalog available to Cart so add-to-cart resolves correctly.
+  Cart.register(catalog);
+
+  // Featured grid: prioritize hot, then new, then any other kit, capped at 4.
+  const featured = [
+    ...catalog.filter(p => p.badge === 'hot').slice(0, 2),
+    ...catalog.filter(p => p.badge === 'new').slice(0, 1),
+    ...catalog.filter(p => !p.badge && p.cat === 'kit').slice(0, 1),
+  ].slice(0, 4);
+  document.getElementById('featuredGrid').innerHTML =
+    featured.map(p => productCardHTML(p, '')).join('') ||
+    `<div style="grid-column:1/-1;text-align:center;color:var(--ink-4);padding:32px">Chưa có sản phẩm nổi bật.</div>`;
+
+  initHeroCarousel(catalog);
+})();
 
 /* ══════════════════════════════════════════
    Hero Carousel — auto-slide every 4s
-   Slide order: Book01-1, Book01-2, KIT01-1 … KIT08-1
    ══════════════════════════════════════════ */
-(function() {
-  const BASE = 'assets/images/product-images/';
+function initHeroCarousel(catalog) {
+  const BASE = BASE_IMG;
+  const kits = catalog.filter(p => p.cat === 'kit');
 
-  // Build slide data: [{ src, label, badge, bg, em, kitId }]
+  // Book slides are bundled assets unrelated to the kit catalog.
   const slides = [
-    // Book slides first (sách thủ công)
-    { src: BASE + 'Book/Book01-1.png', label: 'Sách Thủ Công Mùa Xuân', badge: '📖 Sách hướng dẫn', bg: '#FEF9E7', em: '📖', kitId: 9 },
-    { src: BASE + 'Book/Book01-2.png', label: 'Sách Thủ Công Mùa Xuân', badge: '✏️ 20 bài hướng dẫn', bg: '#FEF9E7', em: '📖', kitId: 9 },
-    // Kit slides
-    ...PRODUCTS.filter(p => p.cat === 'kit').map(p => ({
-      src: BASE + `KIT${String(p.id).padStart(2,'0')}/KIT${String(p.id).padStart(2,'0')}-1.png`,
+    { src: BASE + 'Book/Book01-1.png', label: 'Sách Thủ Công Mùa Xuân', badge: '📖 Sách hướng dẫn', bg: '#FEF9E7', em: '📖', kitId: kits[0]?.id },
+    { src: BASE + 'Book/Book01-2.png', label: 'Sách Thủ Công Mùa Xuân', badge: '✏️ 20 bài hướng dẫn', bg: '#FEF9E7', em: '📖', kitId: kits[0]?.id },
+    ...kits.map(p => ({
+      src: BASE + `KIT${String(p.id).padStart(2, '0')}/KIT${String(p.id).padStart(2, '0')}-1.png`,
       label: p.name,
       badge: p.badge === 'hot' ? '🔥 Bán chạy' : p.badge === 'new' ? '✨ Mới' : p.badge === 'sale' ? '🏷 Giảm giá' : `${p.age}`,
       bg: p.bg,
@@ -501,7 +519,7 @@ document.getElementById('featuredGrid').innerHTML = featured.map(p => productCar
   }, { passive:true });
 
   updateFloatCards();
-})();
+}
 </script>
 </body>
 </html>
