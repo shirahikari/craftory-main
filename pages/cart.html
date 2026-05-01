@@ -170,7 +170,7 @@ function showShippingModal() {
   if (!modal) {
     modal = document.createElement('div');
     modal.id = 'shipping-modal';
-    modal.className = 'modal-overlay';
+    modal.className = 'modal-overlay open';
     modal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px';
     const user = Auth.user;
     modal.innerHTML = `
@@ -201,7 +201,7 @@ function showShippingModal() {
       </div>`;
     document.body.appendChild(modal);
   } else {
-    modal.style.display = 'flex';
+    modal.classList.add('open');
   }
 }
 
