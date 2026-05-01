@@ -9,7 +9,7 @@ function buildPaymentInfo(order) {
   const bank = process.env.SEPAY_BANK_CODE;
   const name = process.env.SEPAY_ACCOUNT_NAME;
   if (!acc || !bank) return null;
-  const memo = 'CRAFTORY-' + order.id.slice(-8).toUpperCase();
+  const memo = 'CRAFTORY' + order.id.slice(-8).toUpperCase();
   const qrUrl = `https://qr.sepay.vn/img?acc=${encodeURIComponent(acc)}&bank=${encodeURIComponent(bank)}&amount=${order.total}&des=${encodeURIComponent(memo)}`;
   return {
     qrUrl,
