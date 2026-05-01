@@ -1,10 +1,10 @@
 import { timingSafeEqual } from 'crypto';
 
-// Memo we instruct customers to use looks like: CRAFTORY-XYZ12345
+// Memo we instruct customers to use looks like: CRAFTORYPXYZ12345
 // where the suffix is the last 8 chars of the cuid Order.id (uppercased).
 // SePay's "code" field auto-extracts this when its dashboard regex is set
-// to /CRAFTORY-([A-Z0-9]+)/. We also regex-fallback on the raw "content".
-const MEMO_RE = /CRAFTORY-([A-Z0-9]{6,16})/i;
+// to /CRAFTORY([A-Z0-9]+)/. We also regex-fallback on the raw "content".
+const MEMO_RE = /CRAFTORY([A-Z0-9]{6,16})/i;
 
 function safeApiKeyEqual(provided, expected) {
   if (!provided || !expected) return false;
