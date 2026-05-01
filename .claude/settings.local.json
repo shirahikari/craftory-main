@@ -4,7 +4,14 @@
       "Bash(node *)",
       "Bash(git *)",
       "WebFetch(domain:developer.sepay.vn)",
-      "WebFetch(domain:docs.sepay.vn)"
+      "WebFetch(domain:docs.sepay.vn)",
+      "Bash(docker --version)",
+      "Read(//var/lib/**)",
+      "Bash(apt list *)",
+      "Bash(curl -s -o /tmp/qr.png -w 'HTTP %{http_code} · %{size_download} bytes · %{content_type}\\\\n' 'https://qr.sepay.vn/img?acc=2748299997&bank=MB&amount=200000&des=CRAFTORY-8765KLMN')",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /tmp/qr.png -w 'HTTP %{http_code} · %{size_download} bytes · %{content_type}\\\\n' -H 'User-Agent: Mozilla/5.0 \\(X11; Linux x86_64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/120.0.0.0 Safari/537.36' -H 'Accept: image/avif,image/webp,image/png,image/*,*/*;q=0.8' 'https://qr.sepay.vn/img?acc=2748299997&bank=MB&amount=200000&des=CRAFTORY-8765KLMN')",
+      "Bash(grep -nC 1 \"buildPaymentInfo\" /home/thutran/Desktop/craftory-main/backend/src/routes/orders.js)"
     ]
   }
 }
